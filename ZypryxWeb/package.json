@@ -1,0 +1,17 @@
+{
+  "name": "zypryxweb",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "build": "postcss src/styles.css -o wwwroot/css/site.css",
+    "watch": "postcss src/styles.css -o wwwroot/css/site.css --watch"
+  },
+  "dependencies": {
+    "@tailwindcss/postcss": "^4.3.0",
+    "postcss": "^8.5.15",
+    "tailwindcss": "^4.3.0"
+  },
+  "devDependencies": {
+    "postcss-cli": "^11.0.1"
+  }
+}

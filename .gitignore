@@ -1,0 +1,95 @@
+##############################
+# .NET BUILD ARTIFACTS
+##############################
+bin/
+obj/
+out/
+artifacts/
+
+##############################
+# USER SECRETS & CONFIG
+##############################
+appsettings.Development.json
+appsettings.Local.json
+secrets.json
+
+##############################
+# ASP.NET CORE RUNTIME FILES
+##############################
+*.db
+*.db-shm
+*.db-wal
+*.pfx
+*.p12
+*.cer
+
+##############################
+# STATIC WEB ASSETS
+##############################
+wwwroot/lib/
+wwwroot/node_modules/
+wwwroot/dist/
+wwwroot/bundle/
+
+##############################
+# NODE / FRONTEND (if using)
+##############################
+node_modules/
+npm-debug.log
+yarn-debug.log
+yarn-error.log
+*.tsbuildinfo
+
+##############################
+# VISUAL STUDIO / VS CODE
+##############################
+.vscode/
+.vs/
+*.user
+*.suo
+*.userprefs
+
+##############################
+# LOGS
+##############################
+*.log
+logs/
+LogFiles/
+
+##############################
+# NUGET
+##############################
+*.nupkg
+*.snupkg
+packages/
+.nuget/
+
+##############################
+# RESHARPER / RIDER
+##############################
+.idea/
+*.sln.iml
+_ReSharper*/
+*.DotSettings.user
+
+##############################
+# PUBLISH OUTPUT
+##############################
+publish/
+*.pubxml
+*.pubxml.user
+
+##############################
+# OS JUNK
+##############################
+# Windows
+Thumbs.db
+Desktop.ini
+
+# macOS
+.DS_Store
+
+# Linux
+*~
+ZypryxWeb/appsettings.json
+ZypryxWeb/wwwroot/lib/jquery/LICENSE.txt

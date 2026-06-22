@@ -1,0 +1,1493 @@
+﻿@using ZypryxWeb.Models.ViewModels
+@model HomePageModelView
+
+@{
+    ViewData["Title"] = "Zypryx - Dashboard";
+}
+
+<style>
+
+    .layout{
+        position:relative;
+        z-index:10;
+        display:flex;
+        flex:1;
+        overflow:hidden;
+        height:calc(100vh - 80px);
+    }
+
+    /* ═══════════════ SIDEBAR ═══════════════ */
+    .sidebar{width:206px;flex-shrink:0;background:var(--p1);border-right:1px solid var(--bdr);display:flex;flex-direction:column;overflow:hidden;}
+    .sb-head{padding:9px 12px;border-bottom:1px solid rgba(255,255,255,.04);display:flex;align-items:center;justify-content:space-between;flex-shrink:0;}
+    .sb-title{font-size:8px;letter-spacing:3px;text-transform:uppercase;color:rgba(255,140,0,.5);}
+    .sb-count{font-size:8px;color:rgba(255,255,255,.2);letter-spacing:1px;}
+    .sb-search{padding:6px 10px;border-bottom:1px solid rgba(255,255,255,.04);flex-shrink:0;}
+    .sb-search input{width:100%;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.07);padding:5px 8px;font-family:var(--fm);font-size:9px;color:#fff;letter-spacing:1px;outline:none;transition:border-color .15s;}
+    .sb-search input::placeholder{color:rgba(255,255,255,.16);}
+    .sb-search input:focus{border-color:rgba(255,140,0,.3);}
+    .sb-label{padding:5px 12px 3px;font-size:7px;letter-spacing:3px;text-transform:uppercase;color:rgba(255,255,255,.16);flex-shrink:0;}
+    .coin-list{overflow-y:auto;scrollbar-width:thin;scrollbar-color:rgba(255,140,0,.15) transparent;}
+    .coin-list::-webkit-scrollbar{width:2px;}
+    .coin-list::-webkit-scrollbar-thumb{background:rgba(255,140,0,.15);}
+    .fav-list{flex-shrink:0;}
+    .all-list{flex:1;}
+
+    /* COIN ROW */
+    .c-row{display:flex;align-items:center;padding:6px 10px;cursor:pointer;border-left:2px solid transparent;gap:6px;transition:all .1s;}
+    .c-row:hover{background:rgba(255,255,255,.02);}
+    .c-row.active{background:rgba(255,140,0,.06);border-left-color:var(--og);}
+    .c-ico{width:24px;height:24px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:8px;font-weight:700;flex-shrink:0;}
+    .c-mid{flex:1;min-width:0;}
+    .c-sym{font-size:10px;font-weight:700;color:#fff;letter-spacing:.5px;}
+    .c-name{font-size:7px;color:rgba(255,255,255,.28);letter-spacing:.3px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+    .c-end{text-align:right;flex-shrink:0;}
+    .c-price{font-size:9px;color:#fff;letter-spacing:.3px;}
+    .c-chg{font-size:8px;}
+    .c-star{background:none;border:none;cursor:pointer;padding:1px 2px;font-size:12px;color:rgba(255,255,255,.14);transition:color .15s;flex-shrink:0;line-height:1;}
+    .c-star:hover{color:rgba(255,140,0,.55);}
+    .c-star.on{color:var(--og);}
+ 
+ 
+    /* ═══════════════ CHART MAIN ═══════════════ */
+    .chart-main {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        overflow: hidden;
+        min-width: 0;
+        background: var(--blk);
+    }
+
+    .chart-hd {
+        padding: 8px 14px;
+        border-bottom: 1px solid var(--bdr);
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        flex-shrink: 0;
+        background: rgba(8,8,8,.7);
+    }
+
+    .ch-left {
+        display: flex;
+        align-items: baseline;
+        gap: 10px;
+        flex-wrap: wrap;
+    }
+
+    .ch-sym {
+        font-family: var(--fd);
+        font-size: 15px;
+        font-weight: 900;
+        color: #fff;
+        letter-spacing: -0.5px;
+    }
+
+    .ch-price {
+        font-family: var(--fd);
+        font-size: 20px;
+        font-weight: 900;
+        color: #fff;
+        letter-spacing: -1px;
+    }
+
+    .ch-chg {
+        font-size: 10px;
+        padding: 2px 8px;
+        letter-spacing: 1px;
+    }
+
+    .ch-right {
+        display: flex;
+        align-items: center;
+        gap: 4px;
+        flex-wrap: wrap;
+    }
+
+    .tf-btn {
+        font-family: var(--fm);
+        font-size: 8px;
+        letter-spacing: 2px;
+        text-transform: uppercase;
+        padding: 4px 9px;
+        background: transparent;
+        border: 1px solid rgba(255,255,255,.09);
+        color: rgba(255,255,255,.32);
+        cursor: pointer;
+        transition: all .12s;
+    }
+
+        .tf-btn:hover {
+            color: #fff;
+            border-color: rgba(255,255,255,.22);
+        }
+
+        .tf-btn.active {
+            color: var(--og);
+            border-color: rgba(255,140,0,.38);
+            background: var(--og-d);
+        }
+
+    .sep {
+        width: 1px;
+        height: 18px;
+        background: rgba(255,255,255,.06);
+        margin: 0 2px;
+    }
+
+    .ct-btn {
+        font-family: var(--fm);
+        font-size: 8px;
+        letter-spacing: 1px;
+        text-transform: uppercase;
+        padding: 4px 9px;
+        background: transparent;
+        border: 1px solid rgba(255,255,255,.07);
+        color: rgba(255,255,255,.28);
+        cursor: pointer;
+        transition: all .12s;
+    }
+
+        .ct-btn:hover {
+            color: #fff;
+            border-color: rgba(255,255,255,.18);
+        }
+
+        .ct-btn.active {
+            color: var(--og);
+            border-color: rgba(255,140,0,.32);
+            background: rgba(255,140,0,.05);
+        }
+
+    .ohlc-bar {
+        padding: 3px 14px;
+        display: flex;
+        gap: 14px;
+        align-items: center;
+        background: rgba(8,8,8,.8);
+        border-bottom: 1px solid rgba(255,255,255,.03);
+        flex-shrink: 0;
+    }
+
+    .ohlc-item {
+        font-size: 9px;
+        letter-spacing: .3px;
+    }
+
+    .ol {
+        color: rgba(255,255,255,.24);
+    }
+
+    .ov {
+        color: rgba(255,255,255,.68);
+        margin-left: 3px;
+    }
+
+    .chart-wrap {
+        flex: 1;
+        position: relative;
+        overflow: hidden;
+        min-height: 0;
+    }
+
+    canvas {
+        display: block;
+    }
+
+    #mainChart {
+        width: 100%;
+        height: 100%;
+    }
+
+    .chart-tooltip {
+        position: absolute;
+        background: rgba(11,11,11,.96);
+        border: 1px solid rgba(255,140,0,.22);
+        padding: 8px 10px;
+        pointer-events: none;
+        font-size: 9px;
+        letter-spacing: .4px;
+        display: none;
+        z-index: 20;
+        min-width: 115px;
+    }
+
+    .tt-sym {
+        font-size: 10px;
+        color: var(--og);
+        letter-spacing: 1px;
+        margin-bottom: 5px;
+        font-weight: 700;
+    }
+
+    .tt-r {
+        display: flex;
+        justify-content: space-between;
+        gap: 14px;
+        padding: 1px 0;
+    }
+
+    .tt-k {
+        color: rgba(255,255,255,.3);
+    }
+
+    .tt-v {
+        color: #fff;
+    }
+
+    .tt-sig {
+        margin-top: 5px;
+        padding-top: 5px;
+        border-top: 1px solid rgba(255,255,255,.06);
+        text-align: center;
+        font-size: 9px;
+        letter-spacing: 2px;
+        font-weight: 700;
+    }
+
+    .vol-wrap {
+        height: 64px;
+        flex-shrink: 0;
+        border-top: 1px solid rgba(255,255,255,.04);
+    }
+
+    #volChart {
+        width: 100%;
+        height: 100%;
+        display: block;
+    }
+
+    .chart-foot {
+        padding: 3px 14px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        border-top: 1px solid rgba(255,255,255,.03);
+        flex-shrink: 0;
+    }
+
+    .cf-info {
+        font-size: 7px;
+        color: rgba(255,255,255,.16);
+        letter-spacing: 1px;
+        text-transform: uppercase;
+    }
+
+    .sig-legend {
+        display: flex;
+        gap: 10px;
+    }
+
+    .sleg {
+        font-size: 7px;
+        letter-spacing: 1px;
+        display: flex;
+        align-items: center;
+        gap: 4px;
+    }
+
+    .sleg-dot {
+        width: 7px;
+        height: 7px;
+    }
+
+    /* ═══════════════ RIGHT PANEL ═══════════════ */
+    .right-panel {
+        width: 282px;
+        flex-shrink: 0;
+        background: var(--p1);
+        border-left: 1px solid var(--bdr);
+        display: flex;
+        flex-direction: column;
+        overflow-y: auto;
+        scrollbar-width: thin;
+        scrollbar-color: rgba(255,140,0,.12) transparent;
+    }
+
+        .right-panel::-webkit-scrollbar {
+            width: 2px;
+        }
+
+        .right-panel::-webkit-scrollbar-thumb {
+            background: rgba(255,140,0,.12);
+        }
+
+    .rp-sec {
+        padding: 11px 13px;
+        border-bottom: 1px solid rgba(255,255,255,.04);
+    }
+
+    .rp-title {
+        font-size: 7px;
+        letter-spacing: 3px;
+        text-transform: uppercase;
+        color: rgba(255,140,0,.48);
+        margin-bottom: 9px;
+    }
+
+    .rp-coin-hd {
+        display: flex;
+        align-items: center;
+        gap: 9px;
+        margin-bottom: 9px;
+    }
+
+    .rp-ico {
+        width: 34px;
+        height: 34px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 10px;
+        font-weight: 700;
+        flex-shrink: 0;
+    }
+
+    .rp-price {
+        font-family: var(--fd);
+        font-size: 18px;
+        font-weight: 900;
+        color: #fff;
+        letter-spacing: -1px;
+        line-height: 1;
+    }
+
+    .rp-chg {
+        font-size: 8px;
+        margin-top: 2px;
+        letter-spacing: 1px;
+    }
+
+    .kv {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 3.5px 0;
+        border-bottom: 1px solid rgba(255,255,255,.025);
+    }
+
+        .kv:last-child {
+            border-bottom: none;
+        }
+
+    .kv-k {
+        font-size: 8px;
+        color: rgba(255,255,255,.28);
+        letter-spacing: .3px;
+    }
+
+    .kv-v {
+        font-size: 8px;
+        color: #fff;
+        letter-spacing: .3px;
+    }
+
+    /* SIGNAL BOX */
+    .sig-box {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 10px 11px;
+        border: 1px solid;
+        margin-bottom: 9px;
+    }
+
+    .sig-buy {
+        border-color: rgba(0,201,141,.22);
+        background: rgba(0,201,141,.04);
+    }
+
+    .sig-sell {
+        border-color: rgba(255,77,77,.22);
+        background: rgba(255,77,77,.04);
+    }
+
+    .sig-hold {
+        border-color: rgba(255,140,0,.22);
+        background: rgba(255,140,0,.04);
+    }
+
+    .sig-label {
+        font-family: var(--fd);
+        font-size: 16px;
+        font-weight: 900;
+        letter-spacing: 1px;
+    }
+
+    .sig-buy .sig-label {
+        color: #00c98d;
+    }
+
+    .sig-sell .sig-label {
+        color: #ff4d4d;
+    }
+
+    .sig-hold .sig-label {
+        color: var(--og);
+    }
+
+    .sig-meta {
+        text-align: right;
+    }
+
+    .sig-cf-lbl {
+        font-size: 7px;
+        color: rgba(255,255,255,.28);
+        letter-spacing: 1px;
+    }
+
+    .sig-cf-val {
+        font-size: 11px;
+        color: #fff;
+        letter-spacing: 1px;
+        font-weight: 700;
+    }
+
+    /* PROGRESS */
+    .prog {
+        margin-bottom: 7px;
+    }
+
+    .prog-row {
+        display: flex;
+        justify-content: space-between;
+        font-size: 8px;
+        color: rgba(255,255,255,.28);
+        letter-spacing: .5px;
+        margin-bottom: 3px;
+    }
+
+    .prog-bg {
+        background: rgba(255,255,255,.055);
+        height: 3px;
+        border-radius: 2px;
+    }
+
+    .prog-fill {
+        height: 3px;
+        border-radius: 2px;
+        transition: width .4s ease;
+    }
+
+    /* ═══════════════ TRADE PANEL ═══════════════ */
+    .trade-section {
+        position: relative;
+        overflow: hidden;
+    }
+
+    .trade-tabs {
+        display: flex;
+        border-bottom: 1px solid rgba(255,255,255,.05);
+    }
+
+    .trade-tab {
+        flex: 1;
+        padding: 7px;
+        font-family: var(--fm);
+        font-size: 8px;
+        letter-spacing: 2px;
+        text-transform: uppercase;
+        background: none;
+        border: none;
+        color: rgba(255,255,255,.28);
+        cursor: pointer;
+        transition: all .15s;
+        border-bottom: 2px solid transparent;
+    }
+
+        .trade-tab.buy.active {
+            color: #00c98d;
+            border-bottom-color: #00c98d;
+        }
+
+        .trade-tab.sell.active {
+            color: #ff4d4d;
+            border-bottom-color: #ff4d4d;
+        }
+
+        .trade-tab:hover {
+            color: #fff;
+        }
+
+    .trade-body {
+        padding: 10px 11px;
+    }
+
+    .ot-row {
+        display: flex;
+        gap: 3px;
+        margin-bottom: 9px;
+    }
+
+    .ot-btn {
+        font-family: var(--fm);
+        font-size: 7px;
+        letter-spacing: 1px;
+        text-transform: uppercase;
+        padding: 3px 7px;
+        background: rgba(255,255,255,.03);
+        border: 1px solid rgba(255,255,255,.07);
+        color: rgba(255,255,255,.3);
+        cursor: pointer;
+        transition: all .1s;
+    }
+
+        .ot-btn.active {
+            background: var(--og-d);
+            border-color: rgba(255,140,0,.28);
+            color: var(--og);
+        }
+
+    .ti-row {
+        margin-bottom: 7px;
+    }
+
+    .ti-lbl {
+        font-size: 7px;
+        color: rgba(255,255,255,.28);
+        letter-spacing: .5px;
+        margin-bottom: 3px;
+        display: flex;
+        justify-content: space-between;
+    }
+
+    .ti-bal {
+        color: rgba(255,140,0,.55);
+    }
+
+    .ti-wrap {
+        display: flex;
+        align-items: center;
+        background: rgba(255,255,255,.04);
+        border: 1px solid rgba(255,255,255,.07);
+    }
+
+        .ti-wrap:focus-within {
+            border-color: rgba(255,140,0,.25);
+        }
+
+        .ti-wrap input {
+            flex: 1;
+            background: none;
+            border: none;
+            padding: 6px 8px;
+            font-family: var(--fm);
+            font-size: 10px;
+            color: #fff;
+            outline: none;
+            letter-spacing: .5px;
+            width: 100%;
+        }
+
+            .ti-wrap input::placeholder {
+                color: rgba(255,255,255,.18);
+            }
+
+    .ti-unit {
+        padding: 0 7px;
+        font-size: 7px;
+        color: rgba(255,255,255,.28);
+        letter-spacing: 1px;
+        flex-shrink: 0;
+        border-left: 1px solid rgba(255,255,255,.06);
+    }
+
+    .pct-row {
+        display: flex;
+        gap: 3px;
+        margin-bottom: 8px;
+    }
+
+    .pct-btn {
+        flex: 1;
+        font-family: var(--fm);
+        font-size: 7px;
+        padding: 3px 0;
+        background: rgba(255,255,255,.03);
+        border: 1px solid rgba(255,255,255,.06);
+        color: rgba(255,255,255,.28);
+        cursor: pointer;
+        text-align: center;
+        transition: all .12s;
+    }
+
+        .pct-btn:hover {
+            background: var(--og-d);
+            border-color: rgba(255,140,0,.2);
+            color: var(--og);
+        }
+
+    .trade-total {
+        display: flex;
+        justify-content: space-between;
+        padding: 7px 0;
+        border-top: 1px solid rgba(255,255,255,.05);
+        margin-bottom: 9px;
+        font-size: 9px;
+    }
+
+    .trade-total-k {
+        color: rgba(255,255,255,.28);
+        letter-spacing: .3px;
+    }
+
+    .trade-total-v {
+        color: #fff;
+        letter-spacing: .3px;
+    }
+
+    .trade-submit {
+        width: 100%;
+        padding: 10px;
+        font-family: var(--fd);
+        font-size: 8px;
+        font-weight: 700;
+        letter-spacing: 2px;
+        text-transform: uppercase;
+        border: none;
+        cursor: pointer;
+        transition: all .15s;
+    }
+
+        .trade-submit.buy {
+            background: #00c98d;
+            color: #080808;
+        }
+
+        .trade-submit.sell {
+            background: #ff4d4d;
+            color: #fff;
+        }
+
+        .trade-submit:hover {
+            opacity: .82;
+            transform: translateY(-1px);
+        }
+
+    /* COMING SOON OVERLAY */
+    .cs-overlay {
+        position: absolute;
+        inset: 0;
+        background: rgba(8,8,8,.86);
+        backdrop-filter: blur(3px);
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        z-index: 10;
+        gap: 8px;
+        padding: 20px;
+    }
+
+    .cs-icon {
+        font-size: 26px;
+        margin-bottom: 2px;
+    }
+
+    .cs-title {
+        font-family: var(--fd);
+        font-size: 11px;
+        font-weight: 900;
+        color: var(--og);
+        letter-spacing: 3px;
+        text-transform: uppercase;
+    }
+
+    .cs-sub {
+        font-size: 8px;
+        color: rgba(255,255,255,.28);
+        letter-spacing: .5px;
+        text-align: center;
+        max-width: 180px;
+        line-height: 1.7;
+    }
+
+    .cs-badge {
+        background: var(--og-d);
+        border: 1px solid rgba(255,140,0,.22);
+        padding: 4px 14px;
+        font-size: 7px;
+        letter-spacing: 3px;
+        color: rgba(255,140,0,.65);
+        text-transform: uppercase;
+        margin-top: 2px;
+    }
+
+    .cs-notify {
+        margin-top: 6px;
+        font-family: var(--fm);
+        font-size: 8px;
+        letter-spacing: 2px;
+        text-transform: uppercase;
+        padding: 6px 16px;
+        background: none;
+        border: 1px solid rgba(255,140,0,.25);
+        color: rgba(255,140,0,.55);
+        cursor: pointer;
+        transition: all .15s;
+    }
+
+        .cs-notify:hover {
+            background: var(--og-d);
+            color: var(--og);
+        }
+
+    /* UTILITY */
+    .up {
+        color: #00c98d;
+    }
+
+    .dn {
+        color: #ff4d4d;
+    }
+
+    .og {
+        color: var(--og);
+    }
+
+    * {
+        scrollbar-width: thin;
+        scrollbar-color: rgba(255,140,0,.12) transparent;
+    }
+
+    .border-red {
+        border: 2px solid red
+    }
+
+    .border-green {
+        border: 2px solid green
+    }
+
+    .border-blue {
+        border: 2px solid blue
+    }
+
+
+</style>
+
+<div class="relative flex overflow-hidden w-full h-screen">
+
+    <!-- SIDEBAR -->
+    <aside class="sidebar">
+        <div class="sb-head">
+            <span class="sb-title">Markets</span>
+            <span class="sb-count" id="coinCount">12</span>
+        </div>
+        <div class="sb-search">
+            <input type="text" id="searchInput" placeholder="Search…" oninput="filterCoins(this.value)">
+        </div>
+        <div class="sb-label" id="favLabel">★ Favourites</div>
+        <div class="coin-list fav-list" id="favList"></div>
+        <div class="sb-label">All Markets</div>
+        <div class="coin-list all-list" id="allList"></div>
+    </aside>
+
+    <!-- CHART MAIN -->
+    <main class="chart-main">
+        <div class="chart-hd">
+            <div class="ch-left">
+                <span class="ch-sym" id="chSym">BTC/USDT</span>
+                <span class="ch-price" id="chPrice">$67,412</span>
+                <span class="ch-chg up" id="chChg">+2.14%</span>
+            </div>
+            <div class="ch-right">
+                <button class="tf-btn" onclick="setTf('1h',this)">1H</button>
+                <button class="tf-btn active" onclick="setTf('4h',this)">4H</button>
+                <button class="tf-btn" onclick="setTf('1d',this)">1D</button>
+                <button class="tf-btn" onclick="setTf('1w',this)">1W</button>
+                <div class="sep"></div>
+                <button class="ct-btn active" onclick="setChartType('candle',this)">Candle</button>
+                <button class="ct-btn" onclick="setChartType('line',this)">Line</button>
+            </div>
+        </div>
+
+        <div class="ohlc-bar">
+            <span class="ohlc-item"><span class="ol">O</span><span class="ov" id="ohlcO">—</span></span>
+            <span class="ohlc-item"><span class="ol">H</span><span class="ov" id="ohlcH">—</span></span>
+            <span class="ohlc-item"><span class="ol">L</span><span class="ov" id="ohlcL">—</span></span>
+            <span class="ohlc-item"><span class="ol">C</span><span class="ov" id="ohlcC">—</span></span>
+            <span class="ohlc-item"><span class="ol">Vol</span><span class="ov" id="ohlcV">—</span></span>
+            <span class="ohlc-item" id="ohlcSig"></span>
+        </div>
+
+        <div class="chart-wrap" id="chartWrap">
+            <canvas id="mainChart"></canvas>
+            <div class="chart-tooltip" id="chartTooltip"></div>
+        </div>
+
+        <div class="vol-wrap">
+            <canvas id="volChart"></canvas>
+        </div>
+
+        <div class="chart-foot">
+            <span class="cf-info" id="cfInfo">4H · 60 candles · ZYP-1 Oracle Engine</span>
+            <div class="sig-legend">
+                <span class="sleg"><svg width="7" height="7"><polygon points="3.5,0 7,7 0,7" fill="#00c98d" /></svg><span style="color:#00c98d">BUY</span></span>
+                <span class="sleg"><svg width="7" height="7"><polygon points="3.5,7 7,0 0,0" fill="#ff4d4d" /></svg><span style="color:#ff4d4d">SELL</span></span>
+                <span class="sleg"><svg width="7" height="7"><circle cx="3.5" cy="3.5" r="3" fill="#ff8c00" /></svg><span style="color:#ff8c00">HOLD</span></span>
+            </div>
+        </div>
+    </main>
+
+    <!-- RIGHT PANEL -->
+    <aside class="right-panel" id="rightPanel">
+
+        <!-- COIN OVERVIEW -->
+        <div class="rp-sec">
+            <div class="rp-title">Coin Overview</div>
+            <div class="rp-coin-hd">
+                <div class="rp-ico" id="rpIco"></div>
+                <div>
+                    <div class="rp-price" id="rpPrice">—</div>
+                    <div class="rp-chg" id="rpChg">—</div>
+                </div>
+            </div>
+            <div id="rpStats"></div>
+        </div>
+
+        <!-- ZYP-1 SIGNAL -->
+        <div class="rp-sec">
+            <div class="rp-title">ZYP-1 Signal</div>
+            <div id="rpSignal"></div>
+            <div class="prog">
+                <div class="prog-row"><span>Bullish Sentiment</span><span id="bPct">—</span></div>
+                <div class="prog-bg"><div class="prog-fill" id="bBar" style="background:#00c98d;"></div></div>
+            </div>
+            <div class="prog">
+                <div class="prog-row"><span>Fear / Greed Index</span><span id="fgPct">—</span></div>
+                <div class="prog-bg"><div class="prog-fill" id="fgBar" style="background:var(--og);"></div></div>
+            </div>
+            <div class="prog">
+                <div class="prog-row"><span>Volume Momentum</span><span id="vmPct">—</span></div>
+                <div class="prog-bg"><div class="prog-fill" id="vmBar" style="background:#627eea;"></div></div>
+            </div>
+        </div>
+
+        <!-- TRADE PANEL -->
+        <div class="rp-sec trade-section" id="tradeSection">
+            <div class="rp-title">Trade</div>
+            <div class="trade-tabs">
+                <button class="trade-tab buy active" id="buyTab" onclick="setTradeTab('buy',this)">Buy</button>
+                <button class="trade-tab sell" onclick="setTradeTab('sell',this)">Sell</button>
+            </div>
+            <div class="trade-body">
+                <div class="ot-row">
+                    <button class="ot-btn active" onclick="setOT(this)">Market</button>
+                    <button class="ot-btn" onclick="setOT(this)">Limit</button>
+                    <button class="ot-btn" onclick="setOT(this)">Stop</button>
+                </div>
+                <div class="ti-row">
+                    <div class="ti-lbl"><span>Amount</span><span class="ti-bal">Balance: 0.00 USDT</span></div>
+                    <div class="ti-wrap">
+                        <input type="number" id="tradeAmt" placeholder="0.00" oninput="calcTotal()">
+                        <span class="ti-unit">USDT</span>
+                    </div>
+                </div>
+                <div class="pct-row">
+                    <button class="pct-btn">25%</button>
+                    <button class="pct-btn">50%</button>
+                    <button class="pct-btn">75%</button>
+                    <button class="pct-btn">Max</button>
+                </div>
+                <div class="ti-row">
+                    <div class="ti-lbl"><span>Price (per coin)</span></div>
+                    <div class="ti-wrap">
+                        <input type="number" id="tradePrice" placeholder="Market price" oninput="calcTotal()">
+                        <span class="ti-unit">USDT</span>
+                    </div>
+                </div>
+                <div class="trade-total">
+                    <span class="trade-total-k">Estimated Total</span>
+                    <span class="trade-total-v" id="tradeTotal">—</span>
+                </div>
+                <button class="trade-submit buy" id="tradeSubmit">Buy BTC</button>
+            </div>
+
+            <!-- COMING SOON OVERLAY -->
+            <div class="cs-overlay" id="csOverlay">
+                <div class="cs-icon">🔒</div>
+                <div class="cs-title">Coming Soon</div>
+                <div class="cs-sub">Wallet connection and live trading will be available in the next release of Zypryx.</div>
+                <div class="cs-badge">In Development</div>
+                <button class="cs-notify">Notify Me</button>
+            </div>
+        </div>
+
+    </aside>
+
+</div>
+
+@section Scripts {
+<script>
+
+    async function getCoinData(coinId) {
+        const response = await fetch("/Home/GetCoinData", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({ CoinId: coinId })
+        });
+
+        const data = await response.json();
+            console.log(data)
+
+        // Convert to chart format
+        S.candles = convertKlinesToCandles(data);
+
+        // Redraw chart with real data
+        drawChart();
+        drawVol();
+        updateOHLC(-1);
+    }
+
+    function convertKlinesToCandles(klines) {
+        return klines.map(k => ({
+            o: k.open,
+            h: k.high,
+            l: k.low,
+            c: k.close,
+            v: k.volume,
+            signal: k.signal
+        }));
+    }
+
+    /* ════════════════════════════════
+       DATA
+    ════════════════════════════════ */
+    const model = @Html.Raw(Json.Serialize(Model));
+    const COINS = buildUiCoins(model);
+
+    const S = {
+      coin: COINS[0],
+      tf: '4h',
+      chartType: 'candle',
+      favs: new Set(['BTC','ETH']),
+      showTrade: true,
+      candles: [],
+      hoverIdx: -1,
+      tradeTab: 'buy',
+      search: '',
+    };
+
+    /* ════════════════════════════════
+       FORMATTING
+    ════════════════════════════════ */
+    function fp(p){
+      if(p>=10000) return '$'+p.toLocaleString('en-US',{maximumFractionDigits:0});
+      if(p>=1000)  return '$'+p.toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2});
+      if(p>=1)     return '$'+p.toFixed(2);
+      return '$'+p.toFixed(4);
+    }
+    function fv(p){ 
+        return p>=1 ? p.toFixed(2) : p.toFixed(4); 
+    }
+
+    /* ════════════════════════════════
+       COIN LIST
+    ════════════════════════════════ */
+    function renderLists(){
+      const q = S.search.toLowerCase();
+      const filtered = q ? COINS.filter(c=>c.sym.toLowerCase().includes(q)||c.name.toLowerCase().includes(q)) : COINS;
+      const favs = filtered.filter(c=>S.favs.has(c.sym));
+      const fl=document.getElementById('favLabel');
+      fl.style.display = favs.length ? 'block' : 'none';
+      document.getElementById('favList').innerHTML  = favs.map(cRow).join('');
+      document.getElementById('allList').innerHTML  = filtered.map(cRow).join('');
+      document.getElementById('coinCount').textContent = filtered.length;
+    }
+
+    function cRow(c){
+      const act = c.sym===S.coin.sym;
+      const up  = c.chg>=0;
+      const fav = S.favs.has(c.sym);
+      return `<div class="c-row${act?' active':''}" onclick="selectCoin('${c.sym}')">
+        <div class="c-ico" style="background:${c.color}20;color:${c.color};">${c.sym.substring(0,3)}</div>
+        <div class="c-mid"><div class="c-sym">${c.sym}</div><div class="c-name">${c.name}</div></div>
+        <div class="c-end"><div class="c-price">${fp(c.price)}</div><div class="c-chg ${up?'up':'dn'}">${up?'+':''}${c.chg.toFixed(2)}%</div></div>
+        <button class="c-star${fav?' on':''}" onclick="toggleFav(event,'${c.sym}')" title="Favourite">★</button>
+      </div>`;
+    }
+
+    function selectCoin(sym){
+
+        //Changes variable to selected coin
+        S.coin = COINS.find(c=> c.sym===sym);
+
+        //Gets klines adn reading from API call
+        getCoinData(S.coin.id);
+
+        regen(); 
+        updateChartHd(); 
+        updateRightPanel(); 
+        renderLists();
+    }
+
+    function toggleFav(e,sym){
+      e.stopPropagation();
+      S.favs.has(sym)?S.favs.delete(sym):S.favs.add(sym);
+      renderLists();
+    }
+
+    function filterCoins(v){ 
+        S.search=v; 
+        renderLists(); 
+    }
+
+    /* ════════════════════════════════
+       CHART HEADER
+    ════════════════════════════════ */
+    function updateChartHd(){
+      const c=S.coin;
+      document.getElementById('chSym').textContent = c.sym.replace("USDT", "/USDT");
+      document.getElementById('chPrice').textContent = fp(c.price);
+      const el=document.getElementById('chChg');
+      el.textContent=(c.chg>=0?'+':'')+c.chg.toFixed(2)+'%';
+      el.className='ch-chg '+(c.chg>=0?'up':'dn');
+    }
+
+    /* ════════════════════════════════
+       CONTROLS
+    ════════════════════════════════ */
+    function setTf(tf,btn){
+      S.tf=tf;
+      document.querySelectorAll('.tf-btn').forEach(b=>b.classList.remove('active'));
+      btn.classList.add('active');
+      document.getElementById('cfInfo').textContent = tf.toUpperCase()+' · 60 candles · ZYP-1 Oracle Engine';
+      regen();
+    }
+
+    function setChartType(t,btn){
+      S.chartType=t;
+      document.querySelectorAll('.ct-btn').forEach(b=>b.classList.remove('active'));
+      btn.classList.add('active');
+      drawChart();
+    }
+
+    function regen(){
+      S.hoverIdx=-1;
+      drawChart(); 
+      drawVol(); 
+      updateOHLC(-1);
+    }
+
+    /* ════════════════════════════════
+       OHLC BAR
+    ════════════════════════════════ */
+    function updateOHLC(idx){
+      const c = idx>=0 ? S.candles[idx] : S.candles[S.candles.length-1];
+      if(!c) return;
+      document.getElementById('ohlcO').textContent=fv(c.o);
+      document.getElementById('ohlcH').textContent=fv(c.h);
+      document.getElementById('ohlcL').textContent=fv(c.l);
+      document.getElementById('ohlcC').textContent=fv(c.c);
+      document.getElementById('ohlcV').textContent=c.v.toFixed(2)+'B';
+      const se=document.getElementById('ohlcSig');
+      if(c.signal){
+        const col=c.signal==='BUY'?'#00c98d':c.signal==='SELL'?'#ff4d4d':'#ff8c00';
+        se.innerHTML=`<span style="color:${col};font-weight:700;letter-spacing:2px;font-size:9px;">${c.signal}</span>`;
+      } else { se.innerHTML=''; }
+    }
+
+    /* ════════════════════════════════
+       DRAW MAIN CHART
+    ════════════════════════════════ */
+    function drawChart() 
+    {
+      const canvas=document.getElementById('mainChart');
+      const wrap=document.getElementById('chartWrap');
+      canvas.width=wrap.clientWidth;
+      canvas.height=wrap.clientHeight;
+      const W=canvas.width, H=canvas.height;
+      const ctx=canvas.getContext('2d');
+      ctx.clearRect(0,0,W,H);
+      if(!S.candles.length) return;
+
+      const PL=68,PR=68,PT=18,PB=26;
+      const cW=W-PL-PR, cH=H-PT-PB, N=S.candles.length;
+      const slotW=cW/N, bodyW=Math.max(1.5,slotW*0.56);
+
+      const prices=S.candles.flatMap(c=>[c.h,c.l]);
+      const minP=Math.min(...prices), maxP=Math.max(...prices);
+      const buf=(maxP-minP)*0.1;
+      const vMin=minP-buf, vMax=maxP+buf, vRange=vMax-vMin;
+
+      const toX=i=>PL+i*slotW+slotW/2;
+      const toY=p=>PT+cH*(1-(p-vMin)/vRange);
+
+      // Horizontal grid + price labels
+      for(let i=0;i<=6;i++){
+        const y=PT+(cH/6)*i, p=vMax-(vRange/6)*i;
+        ctx.strokeStyle='rgba(255,140,0,0.045)';
+        ctx.lineWidth=0.5;
+        ctx.beginPath(); ctx.moveTo(PL,y); ctx.lineTo(W-PR,y); ctx.stroke();
+        ctx.fillStyle='rgba(255,255,255,0.18)';
+        ctx.font='9px Share Tech Mono,monospace';
+        ctx.textAlign='right';
+        ctx.fillText(p>=1000?p.toFixed(0):p>=1?p.toFixed(2):p.toFixed(4), PL-5, y+3.5);
+      }
+
+      // Vertical grid
+      for(let i=0;i<N;i+=10){
+        ctx.strokeStyle='rgba(255,255,255,0.025)';
+        ctx.lineWidth=0.5;
+        ctx.beginPath(); ctx.moveTo(toX(i),PT); ctx.lineTo(toX(i),H-PB); ctx.stroke();
+      }
+
+      // Time labels
+      ctx.fillStyle='rgba(255,255,255,0.16)';
+      ctx.font='8px Share Tech Mono,monospace';
+      ctx.textAlign='center';
+      for(let i=0;i<N;i+=10){
+        ctx.fillText(timeLabel(i,N,S.tf), toX(i), H-PB+14);
+      }
+
+      if(S.chartType==='line'){
+        // LINE CHART
+        ctx.strokeStyle='#ff8c00';
+        ctx.lineWidth=1.5;
+        ctx.beginPath();
+        S.candles.forEach((c,i)=> i===0 ? ctx.moveTo(toX(i),toY(c.c)) : ctx.lineTo(toX(i),toY(c.c)));
+        ctx.stroke();
+        // Fill area
+        ctx.lineTo(toX(N-1),H-PB);
+        ctx.lineTo(toX(0),H-PB);
+        ctx.closePath();
+        ctx.fillStyle='rgba(255,140,0,0.05)';
+        ctx.fill();
+      } else {
+        // CANDLE CHART
+        S.candles.forEach((c,i)=>{
+          const x=toX(i), isUp=c.c>=c.o;
+          const col=isUp?'#00c98d':'#ff4d4d';
+          const hov=i===S.hoverIdx;
+          const oY=toY(c.o), cY=toY(c.c), hY=toY(c.h), lY=toY(c.l);
+          // Wick
+          ctx.strokeStyle=hov?(isUp?'#00e6a0':'#ff6b6b'):col;
+          ctx.lineWidth=1;
+          ctx.beginPath(); ctx.moveTo(x,hY); ctx.lineTo(x,lY); ctx.stroke();
+          // Body
+          ctx.fillStyle=hov?(isUp?'#00e6a0':'#ff6b6b'):col;
+          ctx.fillRect(x-bodyW/2, Math.min(oY,cY), bodyW, Math.max(1,Math.abs(oY-cY)));
+        });
+      }
+
+        // SIGNAL MARKERS
+        S.candles.forEach((c,i)=>{
+          if(!c.signal) return;
+          const x=toX(i);
+          if(c.signal==='BUY'){
+            const y=toY(c.l)+14;
+            ctx.fillStyle='#00c98d';
+            ctx.beginPath(); ctx.moveTo(x,y-9); ctx.lineTo(x-5,y+2); ctx.lineTo(x+5,y+2); ctx.closePath(); ctx.fill();
+            ctx.font='bold 7px Share Tech Mono,monospace';
+            ctx.textAlign='center';
+            ctx.fillText('B',x,y+12);
+          } else if(c.signal==='SELL'){
+            const y=toY(c.h)-14;
+            ctx.fillStyle='#ff4d4d';
+            ctx.beginPath(); ctx.moveTo(x,y+9); ctx.lineTo(x-5,y-2); ctx.lineTo(x+5,y-2); ctx.closePath(); ctx.fill();
+            ctx.font='bold 7px Share Tech Mono,monospace';
+            ctx.textAlign='center';
+            ctx.fillText('S',x,y-6);
+          } else {
+            const y=toY((c.h+c.l)/2);
+            ctx.fillStyle='#ff8c00';
+            ctx.beginPath(); ctx.arc(x,y,3.5,0,Math.PI*2); ctx.fill();
+            ctx.fillStyle='rgba(255,140,0,0.7)';
+            ctx.font='bold 7px Share Tech Mono,monospace';
+            ctx.textAlign='center';
+            ctx.fillText('H',x,y-7);
+          }
+        });
+         // Current price dashed line
+      const lastY=toY(S.candles[N-1].c);
+      ctx.strokeStyle='rgba(255,140,0,0.55)';
+      ctx.lineWidth=0.8;
+      ctx.setLineDash([4,4]);
+      ctx.beginPath(); ctx.moveTo(PL,lastY); ctx.lineTo(W-PR,lastY); ctx.stroke();
+      ctx.setLineDash([]);
+
+      // Price tag
+      ctx.fillStyle='#ff8c00';
+      ctx.fillRect(W-PR,lastY-8,PR,16);
+      ctx.fillStyle='#080808';
+      ctx.font='9px Share Tech Mono,monospace';
+      ctx.textAlign='left';
+      ctx.fillText(fp(S.candles[N-1].c).replace('$',''), W-PR+3, lastY+3.5);
+
+      // Hover crosshair
+      if(S.hoverIdx>=0){
+        const hx=toX(S.hoverIdx);
+        const hc=S.candles[S.hoverIdx];
+        ctx.strokeStyle='rgba(255,255,255,0.12)';
+        ctx.lineWidth=0.7;
+        ctx.setLineDash([3,3]);
+        ctx.beginPath(); ctx.moveTo(hx,PT); ctx.lineTo(hx,H-PB); ctx.stroke();
+        const hy=toY(hc.c);
+        ctx.beginPath(); ctx.moveTo(PL,hy); ctx.lineTo(W-PR,hy); ctx.stroke();
+        ctx.setLineDash([]);
+        // Time tag at bottom
+        ctx.fillStyle='rgba(255,255,255,0.12)';
+        const tl=timeLabel(S.hoverIdx,N,S.tf);
+        const tw=ctx.measureText(tl).width+10;
+        ctx.fillRect(hx-tw/2, H-PB+2, tw, 14);
+        ctx.fillStyle='rgba(255,255,255,0.6)';
+        ctx.font='8px Share Tech Mono,monospace';
+        ctx.textAlign='center';
+        ctx.fillText(tl, hx, H-PB+12);
+      }
+
+    }
+
+    /* ════════════════════════════════
+       DRAW VOLUME
+    ════════════════════════════════ */
+    function drawVol(){
+      const canvas=document.getElementById('volChart');
+      const wrap=document.getElementById('chartWrap');
+      canvas.width=wrap.clientWidth;
+      canvas.height=64;
+      const W=canvas.width, H=64;
+      const ctx=canvas.getContext('2d');
+      ctx.clearRect(0,0,W,H);
+      if(!S.candles.length) return;
+ 
+      const PL=68,PR=68, N=S.candles.length;
+      const cW=W-PL-PR, slotW=cW/N, bodyW=Math.max(1.5,slotW*0.56);
+      const maxV=Math.max(...S.candles.map(c=>c.v));
+      const chartH=H-10;
+ 
+      ctx.fillStyle='rgba(255,140,0,0.1)';
+      ctx.font='7px Share Tech Mono,monospace';
+      ctx.textAlign='right';
+      ctx.fillText('VOL',PL-4,10);
+ 
+      S.candles.forEach((c,i)=>{
+        const x=PL+i*slotW+slotW/2;
+        const bh=(c.v/maxV)*chartH;
+        ctx.fillStyle=c.c>=c.o?'rgba(0,201,141,0.38)':'rgba(255,77,77,0.38)';
+        ctx.fillRect(x-bodyW/2, chartH-bh, bodyW, bh);
+      });
+ 
+      // Hover highlight
+      if(S.hoverIdx>=0){
+        const x=PL+S.hoverIdx*slotW+slotW/2;
+        const c=S.candles[S.hoverIdx];
+        const bh=(c.v/maxV)*chartH;
+        ctx.fillStyle=c.c>=c.o?'rgba(0,201,141,0.7)':'rgba(255,77,77,0.7)';
+        ctx.fillRect(x-bodyW/2, chartH-bh, bodyW, bh);
+      }
+    }
+
+    /* ════════════════════════════════
+       TIME LABELS
+    ════════════════════════════════ */
+    function timeLabel(idx,total,tf){
+      const mpp={'1h':60,'4h':240,'1d':1440,'1w':10080}[tf]||240;
+      const offset=(total-1-idx)*mpp;
+      const d=new Date(Date.now()-offset*60000);
+      if(tf==='1h'||tf==='4h') return d.getUTCHours().toString().padStart(2,'0')+':00';
+      if(tf==='1d') return ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'][d.getUTCMonth()]+' '+d.getUTCDate();
+      return 'W'+Math.ceil(d.getUTCDate()/7);
+    }
+ 
+    /* ════════════════════════════════
+       MOUSE EVENTS
+    ════════════════════════════════ */
+    function initMouse(){
+      const canvas=document.getElementById('mainChart');
+      const tip=document.getElementById('chartTooltip');
+ 
+      canvas.addEventListener('mousemove',e=>{
+        const r=canvas.getBoundingClientRect();
+        const mx=(e.clientX-r.left)*(canvas.width/r.width);
+        const PL=68,PR=68,N=S.candles.length;
+        const slotW=(canvas.width-PL-PR)/N;
+        const idx=Math.floor((mx-PL)/slotW);
+        if(idx<0||idx>=N){ S.hoverIdx=-1; tip.style.display='none'; drawChart(); drawVol(); return; }
+        S.hoverIdx=idx;
+        const c=S.candles[idx];
+        updateOHLC(idx);
+        const sigCol=c.signal==='BUY'?'#00c98d':c.signal==='SELL'?'#ff4d4d':'#ff8c00';
+        const tx=Math.min(e.clientX-r.left+14, r.width-130);
+        const ty=Math.min(e.clientY-r.top+14,  r.height-120);
+        tip.style.left=tx+'px';
+        tip.style.top=ty+'px';
+        tip.style.display='block';
+        tip.innerHTML=`
+          <div class="tt-sym">${S.coin.sym}/USDT</div>
+          <div class="tt-r"><span class="tt-k">Open</span><span class="tt-v">${fv(c.o)}</span></div>
+          <div class="tt-r"><span class="tt-k">High</span><span class="tt-v up">${fv(c.h)}</span></div>
+          <div class="tt-r"><span class="tt-k">Low</span><span class="tt-v dn">${fv(c.l)}</span></div>
+          <div class="tt-r"><span class="tt-k">Close</span><span class="tt-v">${fv(c.c)}</span></div>
+          <div class="tt-r"><span class="tt-k">Vol</span><span class="tt-v">${c.v.toFixed(2)}B</span></div>
+          ${c.signal?`<div class="tt-sig" style="color:${sigCol}">${c.signal}</div>`:''}
+        `;
+        drawChart(); drawVol();
+      });
+ 
+      canvas.addEventListener('mouseleave',()=>{
+        S.hoverIdx=-1;
+        tip.style.display='none';
+        updateOHLC(-1);
+        drawChart(); drawVol();
+      });
+    }
+    /* ════════════════════════════════
+       RIGHT PANEL
+    ════════════════════════════════ */
+    function updateRightPanel(){
+      const c=S.coin;
+ 
+      document.getElementById('rpIco').style.cssText=`background:${c.color}20;color:${c.color};`;
+      document.getElementById('rpIco').textContent=c.sym.substring(0,3);
+      document.getElementById('rpPrice').textContent=fp(c.price);
+      const rc=document.getElementById('rpChg');
+      rc.textContent=(c.chg>=0?'+':'')+c.chg.toFixed(2)+'% today';
+      rc.className='rp-chg '+(c.chg>=0?'up':'dn');
+
+      document.getElementById('rpStats').innerHTML=`
+        <div class="kv"><span class="kv-k">Market Cap</span><span class="kv-v">${c.mcap}</span></div>
+        <div class="kv"><span class="kv-k">24h Volume</span><span class="kv-v">${c.vol}</span></div>
+        <div class="kv"><span class="kv-k">24h High</span><span class="kv-v up">${fp(c.h24)}</span></div>
+        <div class="kv"><span class="kv-k">24h Low</span><span class="kv-v dn">${fp(c.l24)}</span></div>
+        <div class="kv"><span class="kv-k">Circulating</span><span class="kv-v">${c.supply}</span></div>
+        <div class="kv"><span class="kv-k">Rank</span><span class="kv-v og">N/A</span></div>
+      `;
+ 
+      const sc=c.signal==='BUY'?'sig-buy':c.signal==='SELL'?'sig-sell':'sig-hold';
+      document.getElementById('rpSignal').innerHTML=`
+        <div class="sig-box ${sc}">
+          <div>
+            <div style="font-size:7px;letter-spacing:2px;color:rgba(255,255,255,.25);margin-bottom:2px;">ZYP-1 ORACLE</div>
+            <div class="sig-label">${c.signal}</div>
+          </div>
+          <div class="sig-meta">
+            <div class="sig-cf-lbl">Confidence</div>
+            <div class="sig-cf-val">${c.conf}%</div>
+          </div>
+        </div>
+      `;
+ 
+      const bull=c.signal==='BUY'?60+rnd(28):c.signal==='SELL'?15+rnd(20):38+rnd(18);
+      const fg=28+rnd(48), vm=35+rnd(42);
+      set('bPct', bull+'%');   setW('bBar', bull);
+      set('fgPct', fg);        setW('fgBar', fg);
+      set('vmPct', vm+'%');    setW('vmBar', vm);
+ 
+      document.getElementById('tradeSubmit').textContent=(S.tradeTab==='buy'?'Buy ':'Sell ')+c.sym;
+      document.getElementById('tradeSubmit').className='trade-submit '+S.tradeTab;
+    }
+ 
+    function rnd(n){ return Math.floor(Math.random()*n); }
+    function set(id,v){ const e=document.getElementById(id); if(e) e.textContent=v; }
+    function setW(id,v){ const e=document.getElementById(id); if(e) e.style.width=v+'%'; }
+ 
+
+    /* ════════════════════════════════
+       TRADE PANEL
+    ════════════════════════════════ */
+    function setTradeTab(tab,btn){
+      S.tradeTab=tab;
+      document.querySelectorAll('.trade-tab').forEach(b=>b.classList.remove('active'));
+      btn.classList.add('active');
+      const sub=document.getElementById('tradeSubmit');
+      sub.className='trade-submit '+tab;
+      sub.textContent=(tab==='buy'?'Buy ':'Sell ')+S.coin.sym;
+    }
+ 
+    function setOT(btn){
+      document.querySelectorAll('.ot-btn').forEach(b=>b.classList.remove('active'));
+      btn.classList.add('active');
+    }
+ 
+    function calcTotal(){
+      const amt=parseFloat(document.getElementById('tradeAmt').value)||0;
+      const price=parseFloat(document.getElementById('tradePrice').value)||S.coin.price;
+      if(amt>0){
+        const total=(amt/price)*price;
+        document.getElementById('tradeTotal').textContent='$'+total.toFixed(2)+' USDT';
+      } else {
+        document.getElementById('tradeTotal').textContent='—';
+      }
+    }
+ 
+    function toggleTradePanel(){
+      S.showTrade=!S.showTrade;
+      document.getElementById('tradeSection').style.display=S.showTrade?'block':'none';
+      document.getElementById('toggleBtn').textContent=S.showTrade?'Hide Trade':'Show Trade';
+    }
+
+    /* ════════════════════════════════
+       TICKER
+    ════════════════════════════════ */
+    function buildTicker(){
+      const items=[...COINS,...COINS].map(c=>`
+        <span class="t-item">
+          <span class="t-sym">${c.sym}</span>
+          <span class="t-px">${fp(c.price)}</span>
+          <span class="${c.chg>=0?'t-up':'t-dn'}">${c.chg>=0?'+':''}${c.chg.toFixed(2)}%</span>
+          <span class="${c.signal==='BUY'?'t-up':c.signal==='SELL'?'t-dn':'t-hold'}" style="font-size:7px;letter-spacing:1px;">${c.signal}</span>
+        </span>
+      `).join('');
+      document.getElementById('tickerTrack').innerHTML=items;
+    }
+ 
+    /* ════════════════════════════════
+       CLOCK
+    ════════════════════════════════ */
+    function tickClock(){
+      const n=new Date(),p=x=>String(x).padStart(2,'0');
+      const el=document.getElementById('navClock');
+      if(el) el.textContent=p(n.getUTCHours())+':'+p(n.getUTCMinutes())+':'+p(n.getUTCSeconds())+' UTC';
+    }
+
+    /* ════════════════════════════════
+       NAV TABS
+    ════════════════════════════════ */
+    document.querySelectorAll('.nav-tab').forEach(btn=>{
+      btn.addEventListener('click',()=>{
+        document.querySelectorAll('.nav-tab').forEach(b=>b.classList.remove('active'));
+        btn.classList.add('active');
+      });
+    });
+ 
+    /* ════════════════════════════════
+       LIVE PRICE SIMULATION
+    ════════════════════════════════ */
+    function simPrices(){
+      COINS.forEach(c=>{
+        const d=(Math.random()-0.499)*c.price*0.001;
+        c.price=Math.max(c.price*0.85, c.price+d);
+      });
+      buildTicker(); renderLists();
+      updateChartHd(); updateRightPanel();
+    }
+
+    /* ════════════════════════════════
+       INIT
+    ════════════════════════════════ */
+    window.addEventListener('load',()=>{
+      renderLists();
+      updateChartHd();
+      regen();
+      updateRightPanel();
+      buildTicker();
+      initMouse();
+      tickClock();
+      setInterval(tickClock, 1000);
+      setInterval(simPrices, 4000);
+ 
+      function resize(){ 
+          drawChart(); 
+          drawVol(); 
+      }
+
+      window.addEventListener('resize', resize);
+      new ResizeObserver(resize).observe(document.getElementById('chartWrap'));
+    });
+ 
+</script>
+}

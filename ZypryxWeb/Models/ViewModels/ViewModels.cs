@@ -17,8 +17,9 @@ namespace ZypryxWeb.Models.ViewModels
 		public decimal Volume { get; set; }
 		public long Time { get; set; }
 		public string ? Signal { get; set; }
+		public double ProbSell { get; set; }
+		public double ProbHold { get; set; }
+		public double ProbBuy { get; set; }
 	}
-
-
 
 }

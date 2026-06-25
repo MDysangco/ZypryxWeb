@@ -29,13 +29,12 @@ namespace ZypryxWeb.Controllers
 				string token = Utils.JwtFactory.CreateInternalServiceToken(_config, "tasker", 60);
 				ZypryxClient zypryxClient = new ZypryxClient(token);
 
-				List<Coin>? coins = await zypryxClient.GetAllCoins();
+				List<Coin> coins = await zypryxClient.GetAllCoins() ?? new List<Coin>();
 				List<Kline> klines = new List<Kline>();
 
 				foreach (Coin coin in coins)
 				{
-					//CHANGE THIS TO GET LAST 7 DAYS when going live
-					List<Kline>? coinKlines = await zypryxClient.GetKlines(coin.Id, KlineInterval.OneHour, DateTimeOffset.UtcNow.ToUnixTimeMilliseconds(), DateTimeOffset.UtcNow.AddDays(-20).ToUnixTimeMilliseconds());
+					List<Kline>? coinKlines = await zypryxClient.GetKlines(coin.Id, KlineInterval.OneHour, DateTimeOffset.UtcNow.ToUnixTimeMilliseconds(), DateTimeOffset.UtcNow.AddDays(-7).ToUnixTimeMilliseconds());
 					if (coinKlines != null)
 					{
 						klines.AddRange(coinKlines);
@@ -66,8 +65,7 @@ namespace ZypryxWeb.Controllers
 
 				foreach (Coin coin in coins)
 				{
-					//CHANGE THIS TO GET LAST 7 DAYS when going live
-					List<Kline>? coinKlines = await zypryxClient.GetKlines(coin.Id, KlineInterval.OneHour, DateTimeOffset.UtcNow.ToUnixTimeMilliseconds(), DateTimeOffset.UtcNow.AddDays(-20).ToUnixTimeMilliseconds());
+					List<Kline>? coinKlines = await zypryxClient.GetKlines(coin.Id, KlineInterval.OneHour);
 					if (coinKlines != null)
 					{
 						klines.AddRange(coinKlines);
@@ -121,7 +119,10 @@ namespace ZypryxWeb.Controllers
 					Close = k.ClosePrice ?? 0m,
 					Volume = k.Volume ?? 0m,
 					Time = k.KlineOpenTime.Value,
-					Signal = r?.FinalSignal
+					Signal = r?.FinalSignal,
+					ProbSell = r?.ProbSell ?? 0.0,
+					ProbHold = r?.ProbHold ?? 0.0,
+					ProbBuy = r?.ProbBuy ?? 0.0
 				};
 
 			}).ToList();

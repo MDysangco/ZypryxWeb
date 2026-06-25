@@ -7,7 +7,6 @@
     <script type="importmap"></script>
     <link rel="stylesheet" href="~/src/styles.css" asp-append-version="true" />
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
-    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Share+Tech+Mono&display=swap" rel="stylesheet">
@@ -15,9 +14,9 @@
 </head>
 <body class="bg-black">
 
-    <div class="container max-w-[1920px] h-screen mx-auto">
+    <div class="container max-w-[1920px] h-screen mx-auto flex flex-col">
 
-        <nav class="navbar flex flex-col justify-between items-center bg-black gap-5 sm:gap-8 z-11 sm:px-10 pt-6 sm:pt-10 sticky top-0 w-full">
+        <nav class="navbar flex-shrink-0 flex flex-col justify-between items-center bg-black gap-5 sm:gap-8 z-11 sm:px-10 pt-6 sm:pt-10 sticky top-0 w-full">
 
             <div class="flex flex-row justify-between items-center bg-black z-11 w-full">
                 <a href="/" class="nav-logo flex flex-row gap-2">
@@ -73,13 +72,13 @@
         <div class="corner br"></div>
 
      
-        <div class="w-full">
-            <main role="main">
-                @RenderBody() //has the razor code for the coins
+        <div class="w-full flex-1 min-h-0">
+            <main role="main" class="h-full">
+                @RenderBody()
             </main>
         </div>
 
-        <footer class="hud-bar">
+        <footer class="hud-bar flex-shrink-0">
             <span>SYS · ZYPRYX v1.0</span>
             <span id="utcClock">--:--:-- UTC</span>
             <span>PRED ENGINE · ACTIVE</span>
@@ -88,7 +87,7 @@
 
     <script src="~/lib/jquery/dist/jquery.min.js"></script>
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="~/js/site.js" asp-append-version="true"></script> //has the function
+    <script src="~/js/site.js" asp-append-version="true"></script>
 
     @await RenderSectionAsync("Scripts", required: false)
 </body>

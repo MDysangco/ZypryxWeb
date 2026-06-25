@@ -7,8 +7,8 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Utils" Version="1.0.27" />
-    <PackageReference Include="Zyprix" Version="1.0.27" />
+    <PackageReference Include="Utils" Version="1.0.28" />
+    <PackageReference Include="Zyprix" Version="1.0.28" />
   </ItemGroup>
 
 </Project>

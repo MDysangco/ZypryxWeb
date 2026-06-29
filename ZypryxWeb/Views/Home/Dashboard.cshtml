@@ -210,6 +210,44 @@
         opacity: 0;
         animation: fadeIn 0.5s ease forwards 5.2s;
     }
+
+    /* ── Loading spinner (main chart + right panel) ── */
+    .zy-spinner {
+        width: 36px;
+        height: 36px;
+        border: 3px solid rgba(255, 140, 0, 0.15);
+        border-top-color: var(--orange);
+        border-radius: 50%;
+        animation: zySpin 0.8s linear infinite;
+    }
+
+    @@keyframes zySpin {
+        to {
+            transform: rotate(360deg);
+        }
+    }
+
+    .right-panel {
+        position: relative;
+    }
+
+    .chart-loading,
+    .rp-loading {
+        position: absolute;
+        inset: 0;
+        display: none;
+        align-items: center;
+        justify-content: center;
+        background: rgba(8, 8, 8, 0.55);
+        -webkit-backdrop-filter: blur(2px);
+        backdrop-filter: blur(2px);
+        z-index: 60;
+    }
+
+    .chart-loading.show,
+    .rp-loading.show {
+        display: flex;
+    }
 </style>
 
 
@@ -266,6 +304,7 @@
         <div class="chart-wrap" id="chartWrap">
             <canvas id="klineCanvas" style="cursor:crosshair;"></canvas>
             <div class="chart-tip" id="chartTip"></div>
+            <div class="chart-loading" id="chartLoading"><div class="zy-spinner"></div></div>
         </div>
 
         <!-- VOLUME CANVAS -->
@@ -296,6 +335,8 @@
 
     <!-- RIGHT PANEL -->
     <aside class="right-panel" id="rightPanel">
+
+        <div class="rp-loading" id="rpLoading"><div class="zy-spinner"></div></div>
 
         <!-- COIN OVERVIEW -->
         <div class="rp-sec">
@@ -374,25 +415,37 @@
 <script>
 
     async function getCoinData(coinId) {
-        const response = await fetch("/Home/GetCoinData", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ CoinId: coinId })
-        });
+        const chartLoading = document.getElementById('chartLoading');
+        const rpLoading = document.getElementById('rpLoading');
+        chartLoading?.classList.add('show');
+        rpLoading?.classList.add('show');
 
-        const data = await response.json();
-        S.candles = convertKlinesToCandles(data);
-        ZC.load(S.candles);
+        try {
+            const response = await fetch("/Home/GetCoinData", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ CoinId: coinId })
+            });
 
-        document.getElementById('cfInfo').textContent =
-            `${S.tf.toUpperCase()} · ${ZC.disp.length.toLocaleString()} candles · ZYP-1 Oracle · scroll to zoom · drag to pan`;
+            const data = await response.json();
+            S.candles = convertKlinesToCandles(data);
+            ZC.load(S.candles);
 
-        const latestSignal = S.candles.slice().reverse().find(c => c.signal)?.signal;
-        S.coin.signal = latestSignal || '—';
+            document.getElementById('cfInfo').textContent =
+                `${S.tf.toUpperCase()} · ${ZC.disp.length.toLocaleString()} candles · ZYP-1 Oracle · scroll to zoom · drag to pan`;
 
-        updateHeader(S.coin);
-        updateRightPanel();
-        buildTicker();
+            const latestSignal = S.candles.slice().reverse().find(c => c.signal)?.signal;
+            S.coin.signal = latestSignal || '—';
+
+            updateHeader(S.coin);
+            updateRightPanel();
+            buildTicker();
+        } catch (err) {
+            console.error('getCoinData failed', err);
+        } finally {
+            chartLoading?.classList.remove('show');
+            rpLoading?.classList.remove('show');
+        }
     }
 
     function convertKlinesToCandles(klines) {

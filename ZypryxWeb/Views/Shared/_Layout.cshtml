@@ -12,7 +12,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Share+Tech+Mono&display=swap" rel="stylesheet">
 
 </head>
-<body class="bg-black">
+<body class="bg-black @(ViewData["BodyClass"])">
 
     <div class="container max-w-[1920px] h-screen mx-auto flex flex-col">
 
@@ -46,10 +46,11 @@
                 <span class="theme-orange block z-10 lg:hidden" style="font-size:30px;cursor:pointer" onclick="toggleNav()">&#9776;</span>
 
                 <div id="mySidenav" class="sidenav">
-                    <a href="#">About</a>
-                    <a href="#">Services</a>
-                    <a href="#">Clients</a>  
-                    <a href="#">Contact</a>
+                    <a href="javascript:void(0)" class="closebtn" onclick="closeNav()">&times;</a>
+                    <a href="#features" onclick="closeNav()">Features</a>
+                    <a href="#pricing" onclick="closeNav()">Pricing</a>
+                    <a href="#signals" onclick="closeNav()">Signals</a>
+                    <a href="#about" onclick="closeNav()">About</a>
                 </div>
 
             </div>

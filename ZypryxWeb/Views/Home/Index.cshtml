@@ -3,6 +3,7 @@
 
 @{
     ViewData["Title"] = "Zypryx";
+    ViewData["BodyClass"] = "page-home";
 }
 
 @{
@@ -24,37 +25,23 @@
         decimal prevClose = prev.ClosePrice.Value;
 
         decimal pct = prevClose == 0 ? 0 : ((latestClose - prevClose) / prevClose) * 100;
-        bool up = latestClose >= prevClose;
 
         var coin = Model.Coins.First(c => c.Id == g.Key);
 
-        // Insert slash before USDT
-        string sym = coin.Ticker.Replace("USDT", "/USDT");
-
+        // Raw ticker + numeric values — display formatting (BTC/USDT pair, $ price,
+        // ± %) is handled by the shared buildTicker() in site.js.
         ticker.Add(new
         {
-            sym = sym,
+            sym = coin.Ticker,
             price = Math.Round(latestClose, 2),
-            chg = $"{Math.Round(pct, 2).ToString()}%",
-            up = up
+            chg = Math.Round(pct, 2)
         });
     }
 
-    int tickerCount = ticker.Count;
-    int duration = tickerCount * 3;
-
-    // Serialize to JSON for JS
     var tickerJson = System.Text.Json.JsonSerializer.Serialize(ticker);
 }
 
 <style>
-
-    .ticker-track {
-        display: flex;
-        gap: 0;
-        white-space: nowrap;
-        animation: ticker @($"{duration.ToString()}s") linear infinite;
-    }
 
     /* ── Draw-on animation (stroke) ── */
     .draw {
@@ -211,6 +198,200 @@
         animation: fadeIn 0.5s ease forwards 5.2s;
     }
 
+    /* ── Zypryx wordmark: an old, broken light that flickers on, then holds a steady glow ── */
+    .zypryx-wordmark {
+        animation: signFlicker 3.2s linear both;
+        filter:
+            drop-shadow(0 0 2px rgba(255, 255, 255, 0.95))
+            drop-shadow(0 0 10px rgba(255, 140, 0, 0.85))
+            drop-shadow(0 0 24px rgba(255, 140, 0, 0.6))
+            drop-shadow(0 0 48px rgba(255, 140, 0, 0.4));
+        will-change: opacity;
+    }
+
+    @@keyframes signFlicker {
+        /* erratic struggle to ignite */
+        0%   { opacity: 0; }
+        3%   { opacity: 0.12; }
+        5%   { opacity: 0; }
+        9%   { opacity: 0.7; }
+        11%  { opacity: 0.15; }
+        13%  { opacity: 0.9; }
+        15%  { opacity: 0.2; }
+        18%  { opacity: 0; }
+        22%  { opacity: 1; }
+        24%  { opacity: 0.3; }
+        26%  { opacity: 0.95; }
+        29%  { opacity: 0.1; }
+        32%  { opacity: 0.85; }
+        36%  { opacity: 0; }
+        40%  { opacity: 1; }
+        43%  { opacity: 0.45; }
+        45%  { opacity: 1; }
+        49%  { opacity: 0.25; }
+        53%  { opacity: 0.95; }
+        /* settling — fewer, weaker dropouts */
+        57%  { opacity: 0.55; }
+        61%  { opacity: 1; }
+        66%  { opacity: 0.7; }
+        70%  { opacity: 1; }
+        74%  { opacity: 0.4; }
+        77%  { opacity: 1; }
+        82%  { opacity: 0.8; }
+        86%  { opacity: 1; }
+        91%  { opacity: 0.9; }
+        95%  { opacity: 1; }
+        100% { opacity: 1; }
+    }
+
+    /* ── Homepage layout: page scrolls, footer pinned to bottom of the viewport ── */
+    html {
+        scroll-behavior: smooth;
+    }
+
+    body.page-home .app-shell {
+        height: auto;
+        min-height: 100vh;
+    }
+
+    /* Full-width navbar/footer, but keep the homepage body capped and centred */
+    body.page-home .app-body {
+        max-width: 1920px;
+        margin-inline: auto;
+    }
+
+    body.page-home main[role="main"],
+    body.page-home main[role="main"] > div {
+        height: auto;
+    }
+
+    body.page-home .hud-bar {
+        position: fixed;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: rgba(8, 8, 8, 0.92);
+        -webkit-backdrop-filter: blur(6px);
+        backdrop-filter: blur(6px);
+        z-index: 40;
+    }
+
+    /* Offset anchored sections so they clear the sticky navbar when panned to */
+    section[id] {
+        scroll-margin-top: 140px;
+    }
+
+    /* ── Signals + About sections ── */
+    .signals-intro,
+    .about-text {
+        color: rgba(255, 255, 255, 0.45);
+        font-size: 14px;
+        line-height: 1.9;
+        letter-spacing: 0.4px;
+        max-width: 760px;
+        margin-bottom: 20px;
+    }
+
+    .signal-card {
+        background: var(--panel);
+        border: 1px solid rgba(255, 255, 255, 0.06);
+        border-top: 2px solid var(--orange);
+        padding: 26px 24px;
+        transition: transform 0.3s, border-color 0.3s, background 0.3s;
+    }
+
+    .signal-card:hover {
+        transform: translateY(-4px);
+        border-color: var(--border);
+        background: rgba(255, 140, 0, 0.03);
+    }
+
+    .signal-card.buy {
+        border-top-color: #00c98d;
+    }
+
+    .signal-card.hold {
+        border-top-color: #ff8c00;
+    }
+
+    .signal-card.sell {
+        border-top-color: #ff4d4d;
+    }
+
+    .signal-glyph {
+        width: 34px;
+        height: 34px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin-bottom: 16px;
+    }
+
+    .signal-name {
+        font-family: var(--font-display);
+        font-size: 15px;
+        font-weight: 900;
+        letter-spacing: 2px;
+        margin-bottom: 8px;
+    }
+
+    .signal-card.buy .signal-name {
+        color: #00c98d;
+    }
+
+    .signal-card.hold .signal-name {
+        color: #ff8c00;
+    }
+
+    .signal-card.sell .signal-name {
+        color: #ff4d4d;
+    }
+
+    .signal-desc {
+        font-size: 12px;
+        color: rgba(255, 255, 255, 0.4);
+        line-height: 1.8;
+        letter-spacing: 0.4px;
+    }
+
+    .signals-tick {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        margin-top: 28px;
+        padding: 8px 14px;
+        border: 1px solid rgba(255, 140, 0, 0.2);
+        background: rgba(255, 140, 0, 0.04);
+        font-family: var(--font-mono);
+        font-size: 9px;
+        letter-spacing: 2px;
+        text-transform: uppercase;
+        color: rgba(255, 140, 0, 0.7);
+    }
+
+    .signals-tick-dot {
+        width: 6px;
+        height: 6px;
+        border-radius: 50%;
+        background: #ff8c00;
+        animation: dotBlink 1.2s step-end infinite;
+        flex-shrink: 0;
+    }
+
+    .about-chip {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        background: var(--panel);
+        border: 1px solid rgba(255, 255, 255, 0.06);
+        border-left: 2px solid var(--orange);
+        padding: 14px 18px;
+        font-family: var(--font-mono);
+        font-size: 11px;
+        letter-spacing: 1px;
+        color: rgba(255, 255, 255, 0.6);
+    }
+
 </style>
 
 
@@ -318,8 +499,8 @@
             </div>
 
             <div class="hero-cta mt-10 justify-center">
-                <a href="#" class="cta-primary">Launch App</a>
-                <a href="#" class="cta-ghost">Explore Features</a>
+                <a href="/dashboard" class="cta-primary">Launch App</a>
+                <a href="#features" class="cta-ghost">Explore Features</a>
             </div>
 
             <div class="stats grid grid-cols-2 lg:flex lg:flex-row w-full justify-evenly pt-4">
@@ -343,7 +524,7 @@
         </div>
     </div>
 
-    <section class="w-full max-w-[1200px] text-center lg:text-left justify-center lg:justify-auto mt-40 lg:mt-60">
+    <section id="features" class="w-full max-w-[1200px] text-center lg:text-left justify-center lg:justify-auto mt-40 lg:mt-60">
         <div class="section-label justify-center lg:justify-start">What We Offer</div>
         <h2 class="section-title justify-center lg:justify-start gap-2">Prediction <span>Intelligence</span></h2>
 
@@ -435,7 +616,7 @@
     </section>
 
 
-    <section class="w-full max-w-[1200px] text-left mt-40">
+    <section id="pricing" class="w-full max-w-[1200px] text-left mt-40">
         <div class="section-label justify-center lg:justify-start">Subscription Tiers</div>
         <h2 class="section-title justify-center lg:justify-start gap-2">Choose Your <span>Oracle Unit</span></h2>
 
@@ -448,7 +629,7 @@
                 <span class="tier-sub">Basic Oracle</span>
                 <div class="tier-price"><sup>$</sup>0 <span class="per">/ mo</span></div>
                 <div class="tier-divider"></div>
-                <ul class="tier-features">
+                <ul class="tier-features text-sm">
                     <li>Daily signals</li>
                     <li>Top 10 coins</li>
                     <li>24h forecast</li>
@@ -464,7 +645,7 @@
                 <span class="tier-sub">Pro Oracle</span>
                 <div class="tier-price"><sup>$</sup>29 <span class="per">/ mo</span></div>
                 <div class="tier-divider"></div>
-                <ul class="tier-features">
+                <ul class="tier-features text-sm">
                     <li>Real-time signals</li>
                     <li>Top 100 coins</li>
                     <li>7-day forecast</li>
@@ -481,7 +662,7 @@
                 <span class="tier-sub">Apex Oracle</span>
                 <div class="tier-price"><sup>$</sup>79 <span class="per">/ mo</span></div>
                 <div class="tier-divider"></div>
-                <ul class="tier-features">
+                <ul class="tier-features text-sm">
                     <li>Instant signals</li>
                     <li>All markets</li>
                     <li>30-day forecast</li>
@@ -492,6 +673,75 @@
                 <a href="/Account/Register" class="tier-btn tier-btn-ghost">Go Elite</a>
             </div>
 
+        </div>
+    </section>
+
+    @*Signals*@
+    <section id="signals" class="w-full max-w-[1200px] text-center lg:text-left mt-40">
+        <div class="section-label justify-center lg:justify-start">Live Signals</div>
+        <h2 class="section-title justify-center lg:justify-start gap-2">Every Hour, <span>A New Verdict</span></h2>
+
+        <p class="signals-intro">
+            The ZYP-1 oracle never sleeps. Every sixty minutes it re-scans the market — weighing price action,
+            momentum, volume and on-chain flow — then distills it all into a single, unambiguous call. No noise,
+            no wall of indicators to second-guess. Just one clear verdict, refreshed on the hour, so you always
+            know exactly where the oracle stands before you make your move.
+        </p>
+
+        <div class="flex flex-col lg:flex-row gap-4">
+            <div class="signal-card buy flex-1">
+                <div class="signal-glyph">
+                    <svg width="22" height="22" viewBox="0 0 22 22"><polygon points="11,2 21,20 1,20" fill="#00c98d" /></svg>
+                </div>
+                <div class="signal-name">BUY</div>
+                <div class="signal-desc">Momentum is turning up and the oracle sees room to run — a green light to open or add to a position.</div>
+            </div>
+
+            <div class="signal-card hold flex-1">
+                <div class="signal-glyph">
+                    <svg width="22" height="22" viewBox="0 0 22 22"><circle cx="11" cy="11" r="9" fill="#ff8c00" /></svg>
+                </div>
+                <div class="signal-name">HOLD</div>
+                <div class="signal-desc">The market is undecided. The oracle advises patience — sit tight and protect what you have until the next read.</div>
+            </div>
+
+            <div class="signal-card sell flex-1">
+                <div class="signal-glyph">
+                    <svg width="22" height="22" viewBox="0 0 22 22"><polygon points="11,20 21,2 1,2" fill="#ff4d4d" /></svg>
+                </div>
+                <div class="signal-name">SELL</div>
+                <div class="signal-desc">Pressure is building to the downside. The oracle flags risk ahead — a cue to take profit or step aside.</div>
+            </div>
+        </div>
+
+        <div class="signals-tick">
+            <span class="signals-tick-dot"></span>
+            Recalculated every 60 minutes · Updated hourly across all markets
+        </div>
+    </section>
+
+    @*About*@
+    <section id="about" class="w-full max-w-[1200px] text-center lg:text-left mt-40">
+        <div class="section-label justify-center lg:justify-start">About Zypryx</div>
+        <h2 class="section-title justify-center lg:justify-start gap-2">See Beyond <span>The Market</span></h2>
+
+        <p class="about-text">
+            Zypryx is a crypto prediction platform that turns raw market data into clear, actionable intelligence.
+            We pull live price feeds, order flow and on-chain activity across every major pair, run it through our
+            ZYP-1 oracle models, and surface what actually matters: where the market is heading, and how confident
+            we are about it.
+        </p>
+        <p class="about-text">
+            From a real-time charting dashboard to hourly buy, sell and hold signals and AI-driven forecasts,
+            everything lives in one place — built so you can spend less time staring at charts and more time making
+            decisions. Whether you're tracking a single coin or a whole portfolio, Zypryx hands you the same edge
+            the pros pay for, distilled into signals anyone can read at a glance.
+        </p>
+
+        <div class="flex flex-col sm:flex-row gap-4 mt-4 justify-center lg:justify-start">
+            <div class="about-chip">Real-time charts</div>
+            <div class="about-chip">Hourly oracle signals</div>
+            <div class="about-chip">AI-powered forecasts</div>
         </div>
     </section>
 
@@ -521,33 +771,29 @@
         }
         tick(); setInterval(tick, 1000);
 
-        /* Mobile menu */
-        const burger = document.getElementById('burgerBtn');
-        const mobileMenu = document.getElementById('mobileMenu');
-        if (burger && mobileMenu) {
-        burger.addEventListener('click', () => mobileMenu.classList.toggle('open'));
-        }
-
-
-
         const coins = @Html.Raw(tickerJson);
 
-        function buildTicker() {
-            const track = document.getElementById('tickerTrack');
-            if (!track) {
-                return
-            };
+        // Shared renderer lives in site.js (formats BTC/USDT, $ price, ± %).
+        buildTicker(coins);
 
-            const all = [...coins, ...coins];
-            track.innerHTML = all.map(c => `
-                <span class="ticker-item">
-                <span class="coin">${c.sym}</span>
-                <span class="price">$${c.price}</span>
-                <span class="${c.up ? 'up' : 'down'}">${c.chg}</span>
-                </span>
-            `).join('');
+        /* Nav scroll-spy — highlights the link for the section in view.
+           Smooth panning itself is handled by CSS scroll-behavior + the anchor hrefs. */
+        const navLinks = Array.from(document.querySelectorAll('.nav-links a[href^="#"]'));
+        const spied = navLinks
+            .map(a => document.querySelector(a.getAttribute('href')))
+            .filter(Boolean);
+
+        if ('IntersectionObserver' in window && spied.length) {
+            const spy = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        const id = '#' + entry.target.id;
+                        navLinks.forEach(a => a.classList.toggle('active', a.getAttribute('href') === id));
+                    }
+                });
+            }, { rootMargin: '-45% 0px -50% 0px', threshold: 0 });
+            spied.forEach(s => spy.observe(s));
         }
-        buildTicker();
 
       });
 </script>

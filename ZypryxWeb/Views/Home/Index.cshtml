@@ -25,19 +25,16 @@
         decimal prevClose = prev.ClosePrice.Value;
 
         decimal pct = prevClose == 0 ? 0 : ((latestClose - prevClose) / prevClose) * 100;
-        bool up = latestClose >= prevClose;
 
         var coin = Model.Coins.First(c => c.Id == g.Key);
 
-        // Insert slash before USDT
-        string sym = coin.Ticker.Replace("USDT", "/USDT");
-
+        // Raw ticker + numeric values — display formatting (BTC/USDT pair, $ price,
+        // ± %) is handled by the shared buildTicker() in site.js.
         ticker.Add(new
         {
-            sym = sym,
+            sym = coin.Ticker,
             price = Math.Round(latestClose, 2),
-            chg = $"{Math.Round(pct, 2).ToString()}%",
-            up = up
+            chg = Math.Round(pct, 2)
         });
     }
 
@@ -776,22 +773,8 @@
 
         const coins = @Html.Raw(tickerJson);
 
-        function buildTicker() {
-            const track = document.getElementById('tickerTrack');
-            if (!track) {
-                return
-            };
-
-            const all = [...coins, ...coins];
-            track.innerHTML = all.map(c => `
-                <span class="ticker-item">
-                <span class="coin">${c.sym}</span>
-                <span class="price">$${c.price}</span>
-                <span class="${c.up ? 'up' : 'down'}">${c.chg}</span>
-                </span>
-            `).join('');
-        }
-        buildTicker();
+        // Shared renderer lives in site.js (formats BTC/USDT, $ price, ± %).
+        buildTicker(coins);
 
         /* Nav scroll-spy — highlights the link for the section in view.
            Smooth panning itself is handled by CSS scroll-behavior + the anchor hrefs. */

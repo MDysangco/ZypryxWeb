@@ -3,12 +3,13 @@
 
 @{
     ViewData["Title"] = "Zypryx - Dashboard";
+    ViewData["BodyClass"] = "page-dashboard";
 }
 
 <div class="relative flex overflow-hidden w-full h-full">
 
     <!-- SIDEBAR -->
-    <aside class="sidebar">
+    <aside class="sidebar" id="sidebar">
         <div class="sb-head">
             <span class="sb-title">Markets</span>
             <span class="sb-count" id="coinCount">12</span>
@@ -21,6 +22,9 @@
         <div class="sb-label">All Markets</div>
         <div class="coin-list all-list" id="allList"></div>
     </aside>
+
+    <!-- LEFT RESIZE HANDLE -->
+    <div class="panel-resizer" data-target="sidebar" data-side="left" data-min="200" data-max="460" title="Drag to resize"></div>
 
     <main class="chart-main">
         <div class="coin-hd">
@@ -85,6 +89,9 @@
         </div>
 
     </main>
+
+    <!-- RIGHT RESIZE HANDLE -->
+    <div class="panel-resizer" data-target="rightPanel" data-side="right" data-min="220" data-max="460" title="Drag to resize"></div>
 
     <!-- RIGHT PANEL -->
     <aside class="right-panel" id="rightPanel">
@@ -192,7 +199,7 @@
 
             updateHeader(S.coin);
             updateRightPanel();
-            buildTicker();
+            buildTicker(COINS);
         } catch (err) {
             console.error('getCoinData failed', err);
         } finally {
@@ -392,20 +399,6 @@
     }
 
     /* ════════════════════════════════
-       TICKER
-    ════════════════════════════════ */
-    function buildTicker(){
-      const items=[...COINS,...COINS].map(c=>`
-        <span class="ticker-item">
-          <span class="coin">${c.sym}</span>
-          <span class="price">${fp(c.price)}</span>
-          <span class="${c.chg>=0?'up':'down'}">${c.chg>=0?'+':''}${c.chg.toFixed(2)}%</span>
-        </span>
-      `).join('');
-      document.getElementById('tickerTrack').innerHTML=items;
-    }
-
-    /* ════════════════════════════════
        CLOCK
     ════════════════════════════════ */
     function tickClock(){
@@ -433,7 +426,8 @@
         renderLists();
         updateHeader(S.coin);
         updateRightPanel();
-        buildTicker();
+        buildTicker(COINS);
+        initPanelResizers();
         getCoinData(S.coin.id);
         setInterval(tickClock, 1000);
     });

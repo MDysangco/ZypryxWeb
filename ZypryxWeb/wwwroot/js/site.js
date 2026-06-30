@@ -86,6 +86,67 @@ function buildUiCoins(model) {
 }
 
 
+function buildTicker(coins) {
+    const track = document.getElementById('tickerTrack');
+    if (!track || !Array.isArray(coins)) return;
+
+    const fmtPair = s => (s || '').replace(/USDT$/, '/USDT');
+    const fmtPrice = p => p >= 1
+        ? '$' + p.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })
+        : '$' + p.toFixed(4);
+
+    const all = [...coins, ...coins];
+    track.innerHTML = all.map(c => {
+        const chg = Number(c.chg) || 0;
+        const up = chg >= 0;
+        return `
+        <span class="ticker-item">
+          <span class="coin">${fmtPair(c.sym)}</span>
+          <span class="price">${fmtPrice(Number(c.price) || 0)}</span>
+          <span class="${up ? 'up' : 'down'}">${up ? '+' : ''}${chg.toFixed(2)}%</span>
+        </span>`;
+    }).join('');
+}
+
+function initPanelResizers() {
+    document.querySelectorAll('.panel-resizer').forEach(rz => {
+        const target = document.getElementById(rz.dataset.target);
+        if (!target) return;
+
+        const side = rz.dataset.side === 'right' ? 'right' : 'left';
+        const min = parseInt(rz.dataset.min, 10) || 200;
+        const max = parseInt(rz.dataset.max, 10) || 520;
+
+        let startX = 0, startW = 0;
+
+        const onMove = e => {
+            const dx = e.clientX - startX;
+            const raw = side === 'left' ? startW + dx : startW - dx;
+            target.style.width = Math.max(min, Math.min(max, raw)) + 'px';
+        };
+
+        const onUp = () => {
+            rz.classList.remove('dragging');
+            document.body.style.cursor = '';
+            document.body.style.userSelect = '';
+            window.removeEventListener('mousemove', onMove);
+            window.removeEventListener('mouseup', onUp);
+        };
+
+        rz.addEventListener('mousedown', e => {
+            e.preventDefault();
+            startX = e.clientX;
+            startW = target.getBoundingClientRect().width;
+            rz.classList.add('dragging');
+            document.body.style.cursor = 'col-resize';
+            document.body.style.userSelect = 'none';
+            window.addEventListener('mousemove', onMove);
+            window.addEventListener('mouseup', onUp);
+        });
+    });
+}
+
+
 class ZypChart {
     constructor(o = {}) {
         this.mc = document.getElementById(o.main || 'klineCanvas');
@@ -104,6 +165,7 @@ class ZypChart {
         this.ve = -1;   // viewEnd (exclusive idx in disp[]). -1 = snap to latest
         this.hi = -1;   // Hover index in disp[]. -1 = none
         this.ct = 'candle'; // 'candle' | 'line'
+
 
         // ── Drag state ─────────────────────────────────────────────────
         this.drag = null; // { x, ve0 } while dragging

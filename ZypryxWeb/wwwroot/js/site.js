@@ -74,7 +74,7 @@ function buildUiCoins(model) {
             price: Number(price),
             chg: Number(chg.toFixed(2)),
             mcap: 'N/A',
-            vol: formatMoney(vol24),
+            vol: formatMoney(vol24 * price),
             h24,
             l24,
             supply: 'N/A',

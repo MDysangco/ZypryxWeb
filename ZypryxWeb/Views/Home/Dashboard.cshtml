@@ -5,253 +5,6 @@
     ViewData["Title"] = "Zypryx - Dashboard";
 }
 
-@{
-    var ticker = new List<object>();
-    var grouped = Model.Klines
-        .GroupBy(k => k.CoinId.Value)
-        .ToList();
-
-    foreach (var g in grouped)
-    {
-        var ordered = g.OrderByDescending(k => k.KlineOpenTime).ToList();
-        if (ordered.Count < 2)
-            continue;
-
-        var latest = ordered[0];
-        var prev = ordered[1];
-
-        decimal latestClose = latest.ClosePrice.Value;
-        decimal prevClose = prev.ClosePrice.Value;
-
-        decimal pct = prevClose == 0 ? 0 : ((latestClose - prevClose) / prevClose) * 100;
-        bool up = latestClose >= prevClose;
-
-        var coin = Model.Coins.First(c => c.Id == g.Key);
-
-        // Insert slash before USDT
-        string sym = coin.Ticker.Replace("USDT", "/USDT");
-
-        ticker.Add(new
-        {
-            sym = sym,
-            price = Math.Round(latestClose, 2),
-            chg = $"{Math.Round(pct, 2).ToString()}%",
-            up = up
-        });
-    }
-
-    int tickerCount = ticker.Count;
-    int duration = tickerCount * 3;
-
-    // Serialize to JSON for JS
-    var tickerJson = System.Text.Json.JsonSerializer.Serialize(ticker);
-}
-
-<style>
-
-    .ticker-track {
-        display: flex;
-        gap: 0;
-        white-space: nowrap;
-        animation: ticker @($"{duration.ToString()}s") linear infinite;
-    }
-
-    /* ── Draw-on animation (stroke) ── */
-    .draw {
-        fill: none;
-        stroke-dasharray: 1000;
-        stroke-dashoffset: 1000;
-        animation: drawLine 0.7s ease forwards;
-    }
-
-    @@keyframes drawLine {
-        to {
-            stroke-dashoffset: 0;
-        }
-    }
-
-    /* ── Fade in ── */
-    .fade {
-        opacity: 0;
-        animation: fadeIn 0.4s ease forwards;
-    }
-
-    @@keyframes fadeIn {
-        to {
-            opacity: 1;
-        }
-    }
-
-    /* ── Individual delays ── */
-    .d01 {
-        animation-delay: 0.3s;
-    }
-
-    .d02 {
-        animation-delay: 0.7s;
-    }
-
-    .d03 {
-        animation-delay: 1.2s;
-    }
-
-    .d04 {
-        animation-delay: 1.7s;
-    }
-
-    .d05 {
-        animation-delay: 2.1s;
-    }
-
-    .d06 {
-        animation-delay: 2.5s;
-    }
-
-    .d07 {
-        animation-delay: 2.8s;
-    }
-
-    .d08 {
-        animation-delay: 3.1s;
-    }
-
-    .d09 {
-        animation-delay: 3.4s;
-    }
-
-    .d10 {
-        animation-delay: 3.9s;
-    }
-
-    .d11 {
-        animation-delay: 4.2s;
-    }
-
-    .d12 {
-        animation-delay: 4.4s;
-    }
-
-    .d13 {
-        animation-delay: 4.7s;
-    }
-
-    /* ── Antenna blink ── */
-    .antenna-dot {
-        opacity: 0;
-        animation: fadeIn 0.2s ease forwards 0.4s, antBlink 1.5s ease-in-out infinite 2.5s;
-    }
-
-    @@keyframes antBlink {
-        0%, 100% {
-            opacity: 1;
-            fill: #ff8c00;
-        }
-
-        50% {
-            opacity: 0.2;
-            fill: #ffffff;
-        }
-    }
-
-    /* ── Eye iris draw + pulse ── */
-    .eye-iris {
-        fill: none;
-        stroke: #ff8c00;
-        stroke-width: 1.8;
-        stroke-dasharray: 200;
-        stroke-dashoffset: 200;
-        animation: drawLine 0.7s ease forwards 1.7s, eyePulse 3s ease-in-out infinite 6s;
-    }
-
-    @@keyframes eyePulse {
-        0%, 100% {
-            opacity: 1;
-        }
-
-        50% {
-            opacity: 0.3;
-        }
-    }
-
-    /* ── Eye core + blink ── */
-    .eye-core {
-        opacity: 0;
-        animation: fadeIn 0.3s ease forwards 3.0s, coreBlink 2.5s step-end infinite 7s;
-    }
-
-    @@keyframes coreBlink {
-        0%, 88%, 100% {
-            opacity: 1;
-        }
-
-        90%, 98% {
-            opacity: 0;
-        }
-    }
-
-    /* ── Status dot blink ── */
-    .status-dot {
-        opacity: 0;
-        animation: fadeIn 0.3s ease forwards 5s, dotBlink 1.2s step-end infinite 5.5s;
-    }
-
-    @@keyframes dotBlink {
-        0%, 100% {
-            opacity: 1;
-        }
-
-        50% {
-            opacity: 0;
-        }
-    }
-
-    /* ── Label fade ── */
-    .label-text {
-        opacity: 0;
-        animation: fadeIn 0.5s ease forwards 5.2s;
-    }
-
-    /* ── Loading spinner (main chart + right panel) ── */
-    .zy-spinner {
-        width: 36px;
-        height: 36px;
-        border: 3px solid rgba(255, 140, 0, 0.15);
-        border-top-color: var(--orange);
-        border-radius: 50%;
-        animation: zySpin 0.8s linear infinite;
-    }
-
-    @@keyframes zySpin {
-        to {
-            transform: rotate(360deg);
-        }
-    }
-
-    .right-panel {
-        position: relative;
-    }
-
-    .chart-loading,
-    .rp-loading {
-        position: absolute;
-        inset: 0;
-        display: none;
-        align-items: center;
-        justify-content: center;
-        background: rgba(8, 8, 8, 0.55);
-        -webkit-backdrop-filter: blur(2px);
-        backdrop-filter: blur(2px);
-        z-index: 60;
-    }
-
-    .chart-loading.show,
-    .rp-loading.show {
-        display: flex;
-    }
-</style>
-
-
-
 <div class="relative flex overflow-hidden w-full h-full">
 
     <!-- SIDEBAR -->
@@ -470,7 +223,7 @@
     const COINS = buildUiCoins(model);
 
     const S = {
-      coin: COINS[0],
+      coin: COINS[1], //Grab BTC first
       tf: '4h',
       chartType: 'candle',
       favs: new Set(['BTC','ETH']),
@@ -543,7 +296,7 @@
     ════════════════════════════════ */
     function updateHeader(c){
       const el = (id, v) => { const e = document.getElementById(id); if(e) e.textContent = v; };
-      el('hdSym', c.sym + '/USDT');
+      el('hdSym', c.sym.replace(/USDT$/, '') + '/USDT');
       el('hdPx', fp(c.price));
       const ce = document.getElementById('hdChg');
       if(ce){ ce.textContent=(c.chg>=0?'+':'')+c.chg.toFixed(2)+'%'; ce.className='hd-chg '+(c.chg>=0?'up':'dn'); }
@@ -594,7 +347,7 @@
       document.getElementById('rpSignal').innerHTML=`
         <div class="sig-box ${sc}">
           <div>
-            <div style="font-size:7px;letter-spacing:2px;color:rgba(255,255,255,.25);margin-bottom:2px;">ZYP-1 ORACLE</div>
+            <div style="font-size:10px;letter-spacing:2px;color:rgba(255,255,255,.25);margin-bottom:2px;">ZYP-1 ORACLE</div>
             <div class="sig-label">${c.signal}</div>
           </div>
           <div class="sig-meta">
@@ -628,11 +381,13 @@
     function calcTotal(){
       const amt=parseFloat(document.getElementById('tradeAmt').value)||0;
       const price=parseFloat(document.getElementById('tradePrice').value)||S.coin.price;
-      if(amt>0){
-        const total=(amt/price)*price;
-        document.getElementById('tradeTotal').textContent='$'+total.toFixed(2)+' USDT';
+      const out=document.getElementById('tradeTotal');
+      if(amt>0 && price>0){
+        // Amount is the USDT spend, price is per-coin → estimated coins received
+        const qty=amt/price;
+        out.textContent=qty.toLocaleString('en-US',{maximumFractionDigits:8})+' '+S.coin.sym;
       } else {
-        document.getElementById('tradeTotal').textContent='—';
+        out.textContent='—';
       }
     }
 

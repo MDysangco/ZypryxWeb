@@ -619,9 +619,6 @@
   .max-w-\[1200px\] {
     max-width: 1200px;
   }
-  .max-w-\[1920px\] {
-    max-width: 1920px;
-  }
   .flex-1 {
     flex: 1;
   }
@@ -852,6 +849,9 @@
   }
   .px-6 {
     padding-inline: calc(var(--spacing) * 6);
+  }
+  .px-7 {
+    padding-inline: calc(var(--spacing) * 7);
   }
   .py-0 {
     padding-block: calc(var(--spacing) * 0);
@@ -1116,14 +1116,14 @@
       flex-direction: row;
     }
   }
-  .sm\:gap-8 {
-    @media (width >= 40rem) {
-      gap: calc(var(--spacing) * 8);
-    }
-  }
   .sm\:px-10 {
     @media (width >= 40rem) {
       padding-inline: calc(var(--spacing) * 10);
+    }
+  }
+  .sm\:px-12 {
+    @media (width >= 40rem) {
+      padding-inline: calc(var(--spacing) * 12);
     }
   }
   .sm\:py-15 {
@@ -1184,6 +1184,11 @@
   .lg\:gap-0 {
     @media (width >= 64rem) {
       gap: calc(var(--spacing) * 0);
+    }
+  }
+  .lg\:gap-8 {
+    @media (width >= 64rem) {
+      gap: calc(var(--spacing) * 8);
     }
   }
   .lg\:justify-self-auto {
@@ -1542,6 +1547,7 @@ body {
   margin-left: 50px;
 }
 .ticker-bar {
+  width: 100%;
   height: 32px;
   background: rgba(8,8,8,0.9);
   border-bottom: 1px solid rgba(255,140,0,0.08);
@@ -1549,6 +1555,12 @@ body {
   z-index: 90;
   display: flex;
   align-items: center;
+}
+.ticker-track {
+  display: flex;
+  gap: 0;
+  white-space: nowrap;
+  animation: ticker var(--ticker-duration, 60s) linear infinite;
 }
 .ticker-track:hover {
   animation-play-state: paused;
@@ -1603,7 +1615,7 @@ body {
   border-top: 1px solid rgba(255,255,255,0.1);
 }
 .section-label {
-  font-size: 9px;
+  font-size: 12px;
   letter-spacing: 5px;
   text-transform: uppercase;
   color: var(--orange);
@@ -1789,7 +1801,6 @@ body {
   margin-bottom: 24px;
 }
 .tier-features li {
-  font-size: 10px;
   color: rgba(255,255,255,0.5);
   letter-spacing: 1px;
   display: flex;
@@ -1899,7 +1910,7 @@ a {
   color: #ff8c00;
 }
 .sidebar {
-  width: 206px;
+  width: 280px;
   flex-shrink: 0;
   background: var(--panel);
   border-right: 1px solid var(--border);
@@ -1916,13 +1927,13 @@ a {
   flex-shrink: 0;
 }
 .sb-title {
-  font-size: 8px;
+  font-size: 10px;
   letter-spacing: 3px;
   text-transform: uppercase;
   color: rgba(255,140,0,.5);
 }
 .sb-count {
-  font-size: 8px;
+  font-size: 10px;
   color: rgba(255,255,255,.2);
   letter-spacing: 1px;
 }
@@ -1937,7 +1948,7 @@ a {
   border: 1px solid rgba(255,255,255,.07);
   padding: 5px 8px;
   font-family: var(--font-mono);
-  font-size: 9px;
+  font-size: 12px;
   color: #fff;
   letter-spacing: 1px;
   outline: none;
@@ -1954,10 +1965,10 @@ a {
 }
 .sb-label {
   padding: 5px 12px 3px;
-  font-size: 7px;
+  font-size: 10px;
   letter-spacing: 3px;
   text-transform: uppercase;
-  color: rgba(255,255,255,.16);
+  color: rgba(255,255,255);
   flex-shrink: 0;
 }
 .coin-list {
@@ -1980,7 +1991,7 @@ a {
 .c-row {
   display: flex;
   align-items: center;
-  padding: 6px 10px;
+  padding: 8px 10px;
   cursor: pointer;
   border-left: 2px solid transparent;
   gap: 6px;
@@ -1994,13 +2005,13 @@ a {
   border-left-color: var(--orange);
 }
 .c-ico {
-  width: 24px;
-  height: 24px;
+  width: 34px;
+  height: 34px;
   border-radius: 50%;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 8px;
+  font-size: 12px;
   font-weight: 700;
   flex-shrink: 0;
 }
@@ -2009,13 +2020,13 @@ a {
   min-width: 0;
 }
 .c-sym {
-  font-size: 10px;
+  font-size: 12px;
   font-weight: 700;
   color: #fff;
   letter-spacing: .5px;
 }
 .c-name {
-  font-size: 7px;
+  font-size: 11px;
   color: rgba(255,255,255,.28);
   letter-spacing: .3px;
   overflow: hidden;
@@ -2027,19 +2038,19 @@ a {
   flex-shrink: 0;
 }
 .c-price {
-  font-size: 9px;
+  font-size: 11px;
   color: #fff;
   letter-spacing: .3px;
 }
 .c-chg {
-  font-size: 8px;
+  font-size: 10px;
 }
 .c-star {
   background: none;
   border: none;
   cursor: pointer;
   padding: 1px 2px;
-  font-size: 12px;
+  font-size: 18px;
   color: rgba(255,255,255,.14);
   transition: color .15s;
   flex-shrink: 0;
@@ -2073,7 +2084,7 @@ a {
 }
 .hd-sym {
   font-family: var(--font-display);
-  font-size: 15px;
+  font-size: 20px;
   font-weight: 900;
   color: #fff;
   letter-spacing: -0.5px;
@@ -2086,7 +2097,7 @@ a {
   letter-spacing: -1px;
 }
 .hd-chg {
-  font-size: 10px;
+  font-size: 12px;
   padding: 2px 8px;
   letter-spacing: 1px;
 }
@@ -2103,11 +2114,9 @@ a {
   flex: 1;
 }
 .ov-item {
-  font-size: 9px;
+  color: var(--orange);
+  font-size: 12px;
   letter-spacing: .3px;
-}
-.ov-k {
-  color: rgba(255,255,255,.26);
 }
 .ov-v {
   color: rgba(255,255,255,.7);
@@ -2121,7 +2130,7 @@ a {
 }
 .tf-btn,.ct-btn {
   font-family: var(--font-mono);
-  font-size: 8px;
+  font-size: 12px;
   letter-spacing: 2px;
   text-transform: uppercase;
   padding: 4px 9px;
@@ -2259,6 +2268,7 @@ canvas {
   display: flex;
   flex-direction: column;
   overflow-y: auto;
+  position: relative;
   scrollbar-width: thin;
   scrollbar-color: rgba(255,140,0,.12) transparent;
 }
@@ -2268,12 +2278,38 @@ canvas {
 .right-panel::-webkit-scrollbar-thumb {
   background: rgba(255,140,0,.12);
 }
+.zy-spinner {
+  width: 36px;
+  height: 36px;
+  border: 3px solid rgba(255,140,0,.15);
+  border-top-color: var(--orange);
+  border-radius: 50%;
+  animation: zySpin .8s linear infinite;
+}
+@keyframes zySpin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+.chart-loading,.rp-loading {
+  position: absolute;
+  inset: 0;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  background: rgba(8,8,8,.55);
+  backdrop-filter: blur(2px);
+  z-index: 60;
+}
+.chart-loading.show,.rp-loading.show {
+  display: flex;
+}
 .rp-sec {
   padding: 11px 13px;
   border-bottom: 1px solid rgba(255,255,255,.04);
 }
 .rp-title {
-  font-size: 7px;
+  font-size: 10px;
   letter-spacing: 3px;
   text-transform: uppercase;
   color: rgba(255,140,0,.48);
@@ -2286,26 +2322,26 @@ canvas {
   margin-bottom: 9px;
 }
 .rp-ico {
-  width: 34px;
-  height: 34px;
+  width: 50px;
+  height: 50px;
   border-radius: 50%;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 10px;
+  font-size: 14px;
   font-weight: 700;
   flex-shrink: 0;
 }
 .rp-price {
   font-family: var(--font-display);
-  font-size: 18px;
+  font-size: 24px;
   font-weight: 900;
   color: #fff;
   letter-spacing: -1px;
   line-height: 1;
 }
 .rp-chg {
-  font-size: 8px;
+  font-size: 12px;
   margin-top: 2px;
   letter-spacing: 1px;
 }
@@ -2320,12 +2356,12 @@ canvas {
   border-bottom: none;
 }
 .kv-k {
-  font-size: 8px;
+  font-size: 12px;
   color: rgba(255,255,255,.28);
   letter-spacing: .3px;
 }
 .kv-v {
-  font-size: 8px;
+  font-size: 12px;
   color: #fff;
   letter-spacing: .3px;
 }
@@ -2368,12 +2404,12 @@ canvas {
   text-align: right;
 }
 .sig-cf-lbl {
-  font-size: 7px;
+  font-size: 10px;
   color: rgba(255,255,255,.28);
   letter-spacing: 1px;
 }
 .sig-cf-val {
-  font-size: 11px;
+  font-size: 12px;
   color: #fff;
   letter-spacing: 1px;
   font-weight: 700;
@@ -2566,14 +2602,14 @@ canvas {
 }
 .cs-title {
   font-family: var(--font-display);
-  font-size: 11px;
+  font-size: 14px;
   font-weight: 900;
   color: var(--orange);
   letter-spacing: 3px;
   text-transform: uppercase;
 }
 .cs-sub {
-  font-size: 8px;
+  font-size: 12px;
   color: rgba(255,255,255,.28);
   letter-spacing: .5px;
   text-align: center;
@@ -2584,7 +2620,7 @@ canvas {
   background: var(--orange-dim);
   border: 1px solid rgba(255,140,0,.22);
   padding: 4px 14px;
-  font-size: 7px;
+  font-size: 10px;
   letter-spacing: 3px;
   color: rgba(255,140,0,.65);
   text-transform: uppercase;
@@ -2593,7 +2629,7 @@ canvas {
 .cs-notify {
   margin-top: 6px;
   font-family: var(--font-mono);
-  font-size: 8px;
+  font-size: 10px;
   letter-spacing: 2px;
   text-transform: uppercase;
   padding: 6px 16px;
@@ -2619,6 +2655,16 @@ canvas {
 * {
   scrollbar-width: thin;
   scrollbar-color: rgba(255,140,0,.12) transparent;
+}
+@media (prefers-reduced-motion: reduce) {
+  *,
+    *::before,
+    *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+    scroll-behavior: auto !important;
+  }
 }
 @property --tw-rotate-x {
   syntax: "*";

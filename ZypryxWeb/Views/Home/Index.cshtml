@@ -41,21 +41,10 @@
         });
     }
 
-    int tickerCount = ticker.Count;
-    int duration = tickerCount * 3;
-
-    // Serialize to JSON for JS
     var tickerJson = System.Text.Json.JsonSerializer.Serialize(ticker);
 }
 
 <style>
-
-    .ticker-track {
-        display: flex;
-        gap: 0;
-        white-space: nowrap;
-        animation: ticker @($"{duration.ToString()}s") linear infinite;
-    }
 
     /* ── Draw-on animation (stroke) ── */
     .draw {
@@ -212,14 +201,66 @@
         animation: fadeIn 0.5s ease forwards 5.2s;
     }
 
+    /* ── Zypryx wordmark: an old, broken light that flickers on, then holds a steady glow ── */
+    .zypryx-wordmark {
+        animation: signFlicker 3.2s linear both;
+        filter:
+            drop-shadow(0 0 2px rgba(255, 255, 255, 0.95))
+            drop-shadow(0 0 10px rgba(255, 140, 0, 0.85))
+            drop-shadow(0 0 24px rgba(255, 140, 0, 0.6))
+            drop-shadow(0 0 48px rgba(255, 140, 0, 0.4));
+        will-change: opacity;
+    }
+
+    @@keyframes signFlicker {
+        /* erratic struggle to ignite */
+        0%   { opacity: 0; }
+        3%   { opacity: 0.12; }
+        5%   { opacity: 0; }
+        9%   { opacity: 0.7; }
+        11%  { opacity: 0.15; }
+        13%  { opacity: 0.9; }
+        15%  { opacity: 0.2; }
+        18%  { opacity: 0; }
+        22%  { opacity: 1; }
+        24%  { opacity: 0.3; }
+        26%  { opacity: 0.95; }
+        29%  { opacity: 0.1; }
+        32%  { opacity: 0.85; }
+        36%  { opacity: 0; }
+        40%  { opacity: 1; }
+        43%  { opacity: 0.45; }
+        45%  { opacity: 1; }
+        49%  { opacity: 0.25; }
+        53%  { opacity: 0.95; }
+        /* settling — fewer, weaker dropouts */
+        57%  { opacity: 0.55; }
+        61%  { opacity: 1; }
+        66%  { opacity: 0.7; }
+        70%  { opacity: 1; }
+        74%  { opacity: 0.4; }
+        77%  { opacity: 1; }
+        82%  { opacity: 0.8; }
+        86%  { opacity: 1; }
+        91%  { opacity: 0.9; }
+        95%  { opacity: 1; }
+        100% { opacity: 1; }
+    }
+
     /* ── Homepage layout: page scrolls, footer pinned to bottom of the viewport ── */
     html {
         scroll-behavior: smooth;
     }
 
-    body.page-home .container {
+    body.page-home .app-shell {
         height: auto;
         min-height: 100vh;
+    }
+
+    /* Full-width navbar/footer, but keep the homepage body capped and centred */
+    body.page-home .app-body {
+        max-width: 1920px;
+        margin-inline: auto;
     }
 
     body.page-home main[role="main"],
@@ -591,7 +632,7 @@
                 <span class="tier-sub">Basic Oracle</span>
                 <div class="tier-price"><sup>$</sup>0 <span class="per">/ mo</span></div>
                 <div class="tier-divider"></div>
-                <ul class="tier-features">
+                <ul class="tier-features text-sm">
                     <li>Daily signals</li>
                     <li>Top 10 coins</li>
                     <li>24h forecast</li>
@@ -607,7 +648,7 @@
                 <span class="tier-sub">Pro Oracle</span>
                 <div class="tier-price"><sup>$</sup>29 <span class="per">/ mo</span></div>
                 <div class="tier-divider"></div>
-                <ul class="tier-features">
+                <ul class="tier-features text-sm">
                     <li>Real-time signals</li>
                     <li>Top 100 coins</li>
                     <li>7-day forecast</li>
@@ -624,7 +665,7 @@
                 <span class="tier-sub">Apex Oracle</span>
                 <div class="tier-price"><sup>$</sup>79 <span class="per">/ mo</span></div>
                 <div class="tier-divider"></div>
-                <ul class="tier-features">
+                <ul class="tier-features text-sm">
                     <li>Instant signals</li>
                     <li>All markets</li>
                     <li>30-day forecast</li>
@@ -732,15 +773,6 @@
         if (el) el.textContent = p(n.getUTCHours()) + ':' + p(n.getUTCMinutes()) + ':' + p(n.getUTCSeconds()) + ' UTC';
         }
         tick(); setInterval(tick, 1000);
-
-        /* Mobile menu */
-        const burger = document.getElementById('burgerBtn');
-        const mobileMenu = document.getElementById('mobileMenu');
-        if (burger && mobileMenu) {
-        burger.addEventListener('click', () => mobileMenu.classList.toggle('open'));
-        }
-
-
 
         const coins = @Html.Raw(tickerJson);
 

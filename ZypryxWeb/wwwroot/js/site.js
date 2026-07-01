@@ -1,22 +1,66 @@
 ﻿
+/* ── Mobile nav menu (burger drawer in _Layout) ── */
 function openNav() {
-    document.getElementById("mySidenav").style.width = "250px";
+    const menu = document.getElementById('mobileMenu');
+    if (!menu) return;
+    menu.classList.add('open');
+    menu.setAttribute('aria-hidden', 'false');
+    const burger = document.getElementById('navBurger');
+    burger?.classList.add('open');
+    burger?.setAttribute('aria-expanded', 'true');
+    document.body.classList.add('menu-locked');
 }
 
 function closeNav() {
-    document.getElementById("mySidenav").style.width = "0";
+    const menu = document.getElementById('mobileMenu');
+    if (!menu) return;
+    menu.classList.remove('open');
+    menu.setAttribute('aria-hidden', 'true');
+    const burger = document.getElementById('navBurger');
+    burger?.classList.remove('open');
+    burger?.setAttribute('aria-expanded', 'false');
+    document.body.classList.remove('menu-locked');
 }
-
 
 function toggleNav() {
-    var sideNav = document.getElementById("mySidenav");
-    var width = parseInt(sideNav.style.width) || 0;
-    if (width === 0) {
-        openNav();
-    } else {
-        closeNav();
-    }
+    const menu = document.getElementById('mobileMenu');
+    if (!menu) return;
+    if (menu.classList.contains('open')) closeNav(); else openNav();
 }
+
+/* ── Dashboard markets drawer (mobile) ── */
+function openMarkets() {
+    document.getElementById('sidebar')?.classList.add('open');
+    document.getElementById('dashBackdrop')?.classList.add('show');
+    document.getElementById('mktBtn')?.setAttribute('aria-expanded', 'true');
+}
+
+function closeMarkets() {
+    document.getElementById('sidebar')?.classList.remove('open');
+    document.getElementById('dashBackdrop')?.classList.remove('show');
+    document.getElementById('mktBtn')?.setAttribute('aria-expanded', 'false');
+}
+
+function toggleMarkets() {
+    const sb = document.getElementById('sidebar');
+    if (!sb) return;
+    if (sb.classList.contains('open')) closeMarkets(); else openMarkets();
+}
+
+document.addEventListener('keydown', e => {
+    if (e.key === 'Escape') {
+        closeNav();
+        closeMarkets();
+    }
+});
+
+// Overlays are mobile-only — drop them when the layout switches to desktop
+window.matchMedia('(min-width: 1024px)').addEventListener('change', m => {
+    if (m.matches) {
+        closeNav();
+        closeMarkets();
+    }
+});
 
 function formatMoney(v) {
     if (v >= 1e12) return `$${(v / 1e12).toFixed(2)}T`;
@@ -250,8 +294,11 @@ class ZypChart {
         this.cw = Math.max(3, Math.min(30, chartW / tgt));
     }
 
+    // Axis padding shrinks on small screens so the chart keeps its width
+    _pad() { return this.mc.clientWidth < 640 ? { PL: 48, PR: 48 } : { PL: 72, PR: 72 }; }
+
     // Inner chart width (excludes price/time padding)
-    _cw() { return Math.max(100, this.mc.clientWidth - 72 - 72); }
+    _cw() { const p = this._pad(); return Math.max(100, this.mc.clientWidth - p.PL - p.PR); }
     _ch() { return Math.max(50, this.mc.clientHeight - 20 - 28); }
 
     // Resolved viewEnd (exclusive index, 0 means nothing visible)
@@ -274,7 +321,7 @@ class ZypChart {
             e.preventDefault();
             const r = mc.getBoundingClientRect();
             const rawMx = (e.clientX - r.left) * (mc.width / r.width);
-            const mx = rawMx - 72; // relative to chart inner area (after left padding)
+            const mx = rawMx - this._pad().PL; // relative to chart inner area (after left padding)
             if (mx < 0 || mx > this._cw()) return;
 
             const N = this.disp.length;
@@ -331,7 +378,7 @@ class ZypChart {
             }
 
             // ─ CROSSHAIR ─
-            const PL = 72, PR = 72, PT = 20, PB = 28;
+            const { PL, PR } = this._pad(), PT = 20, PB = 28;
             const inChart = mx > PL && mx < mc.width - PR
                 && my > PT && my < mc.height - PB;
 
@@ -358,6 +405,61 @@ class ZypChart {
         mc.addEventListener('mouseleave', () => {
             if (!this.drag) this._clearHover();
         });
+
+        // ── TOUCH: one finger pans, two fingers pinch-zoom ───────────
+        let pinch = null;
+        const tDist = t => Math.hypot(t[0].clientX - t[1].clientX, t[0].clientY - t[1].clientY);
+        const tX = t => {
+            const r = mc.getBoundingClientRect();
+            return (t.clientX - r.left) * (mc.width / r.width);
+        };
+
+        mc.addEventListener('touchstart', e => {
+            if (e.touches.length === 1) {
+                pinch = null;
+                this.drag = { x: tX(e.touches[0]), ve0: this._rve() };
+            } else if (e.touches.length >= 2) {
+                this.drag = null;
+                pinch = { d: tDist(e.touches), cw0: this.cw };
+            }
+        }, { passive: true });
+
+        mc.addEventListener('touchmove', e => {
+            e.preventDefault(); // chart owns the gesture — keep the page from scrolling
+            const N = this.disp.length;
+            if (!N) return;
+
+            if (pinch && e.touches.length >= 2) {
+                const f = tDist(e.touches) / pinch.d;
+                this.cw = Math.max(2, Math.min(80, pinch.cw0 * f));
+                const minVe = Math.ceil(this._cw() / this.cw);
+                this.ve = Math.max(minVe, Math.min(N, this._rve()));
+                this._updateLiveBtn();
+                this._mark();
+                return;
+            }
+
+            if (this.drag && e.touches.length === 1) {
+                const dx = tX(e.touches[0]) - this.drag.x;
+                const delta = -Math.round(dx / this.cw);
+                const minVe = Math.ceil(this._cw() / this.cw);
+                this.ve = Math.max(minVe, Math.min(N, this.drag.ve0 + delta));
+                this._updateLiveBtn();
+                this._mark();
+            }
+        }, { passive: false });
+
+        const endTouch = e => {
+            if (e.touches.length === 0) {
+                this.drag = null;
+                pinch = null;
+            } else if (e.touches.length === 1) {
+                pinch = null;
+                this.drag = { x: tX(e.touches[0]), ve0: this._rve() };
+            }
+        };
+        mc.addEventListener('touchend', endTouch);
+        mc.addEventListener('touchcancel', endTouch);
     }
 
     _clearHover() {
@@ -449,7 +551,7 @@ class ZypChart {
 
         ctx.clearRect(0, 0, W, H);
 
-        const PL = 72, PR = 72, PT = 20, PB = 28;
+        const { PL, PR } = this._pad(), PT = 20, PB = 28;
         const CW = W - PL - PR, CH = H - PT - PB;
         const N = this.disp.length;
         const vs = this._rvs();
@@ -655,7 +757,7 @@ class ZypChart {
         if (!W || !H || !this.disp.length) return;
         vx.clearRect(0, 0, W, H);
 
-        const PL = 72, PR = 72;
+        const { PL, PR } = this._pad();
         const vs = this._rvs(), ve = this._rve();
         const vis = this.disp.slice(vs, ve);
         if (!vis.length) return;

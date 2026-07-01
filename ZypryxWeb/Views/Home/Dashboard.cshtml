@@ -6,13 +6,16 @@
     ViewData["BodyClass"] = "page-dashboard";
 }
 
-<div class="relative flex overflow-hidden w-full h-full">
+<div class="dash-wrap relative flex overflow-hidden w-full h-full">
 
     <!-- SIDEBAR -->
     <aside class="sidebar" id="sidebar">
         <div class="sb-head">
             <span class="sb-title">Markets</span>
-            <span class="sb-count" id="coinCount">12</span>
+            <div class="flex items-center gap-2">
+                <span class="sb-count" id="coinCount">12</span>
+                <button class="sb-close flex lg:hidden" aria-label="Close markets list" onclick="closeMarkets()">&times;</button>
+            </div>
         </div>
         <div class="sb-search">
             <input type="text" id="searchInput" placeholder="Search…" oninput="filterCoins(this.value)">
@@ -23,11 +26,22 @@
         <div class="coin-list all-list" id="allList"></div>
     </aside>
 
+    <!-- MOBILE BACKDROP (closes the markets drawer) -->
+    <div class="dash-backdrop" id="dashBackdrop" onclick="closeMarkets()"></div>
+
     <!-- LEFT RESIZE HANDLE -->
     <div class="panel-resizer" data-target="sidebar" data-side="left" data-min="200" data-max="460" title="Drag to resize"></div>
 
     <main class="chart-main">
         <div class="coin-hd">
+            <button class="mkt-btn flex lg:hidden" id="mktBtn" aria-label="Open markets list" aria-expanded="false" aria-controls="sidebar" onclick="toggleMarkets()">
+                <svg width="12" height="10" viewBox="0 0 12 10" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <rect width="12" height="2" fill="currentColor" />
+                    <rect y="4" width="12" height="2" fill="currentColor" />
+                    <rect y="8" width="12" height="2" fill="currentColor" />
+                </svg>
+                Mkts
+            </button>
             <span class="hd-sym" id="hdSym">—</span>
             <span class="hd-px" id="hdPx">—</span>
             <span class="hd-chg" id="hdChg">—</span>
@@ -285,6 +299,7 @@
         getCoinData(S.coin.id);
         updateRightPanel();
         renderLists();
+        closeMarkets();
     }
 
     function toggleFav(e,sym){

@@ -50,15 +50,11 @@
                     <a href="/dashboard" class="cta-primary">Launch App</a>
                 </div>
             
-                <span class="nav-burger theme-orange block z-10 lg:hidden" style="font-size:30px;cursor:pointer" onclick="toggleNav()">&#9776;</span>
-
-                <div id="mySidenav" class="sidenav">
-                    <a href="javascript:void(0)" class="closebtn" onclick="closeNav()">&times;</a>
-                    <a href="#features" onclick="closeNav()">Features</a>
-                    <a href="#pricing" onclick="closeNav()">Pricing</a>
-                    <a href="#signals" onclick="closeNav()">Signals</a>
-                    <a href="#about" onclick="closeNav()">About</a>
-                </div>
+                <button id="navBurger" class="nav-burger flex lg:hidden" aria-label="Toggle navigation menu" aria-expanded="false" aria-controls="mobileMenu" onclick="toggleNav()">
+                    <span class="nav-burger-line"></span>
+                    <span class="nav-burger-line"></span>
+                    <span class="nav-burger-line"></span>
+                </button>
 
             </div>
 
@@ -70,6 +66,30 @@
             </div>
 
         </nav>
+
+        @*Mobile navigation drawer*@
+        <div id="mobileMenu" class="mobile-menu" aria-hidden="true">
+            <div class="mobile-menu-backdrop" onclick="closeNav()"></div>
+            <nav class="mobile-menu-panel" aria-label="Mobile navigation">
+                <div class="mm-head">
+                    <span class="mm-sys">// NAV.SYS</span>
+                    <button class="mm-close" aria-label="Close navigation menu" onclick="closeNav()">&times;</button>
+                </div>
+                <div class="mm-links">
+                    <a class="mm-link" href="/#features" onclick="closeNav()"><span class="mm-num">01</span>Features</a>
+                    <a class="mm-link" href="/#pricing" onclick="closeNav()"><span class="mm-num">02</span>Pricing</a>
+                    <a class="mm-link" href="/#signals" onclick="closeNav()"><span class="mm-num">03</span>Signals</a>
+                    <a class="mm-link" href="/#about" onclick="closeNav()"><span class="mm-num">04</span>About</a>
+                </div>
+                <div class="mm-cta">
+                    <a href="/dashboard" class="cta-primary" onclick="closeNav()">Launch App</a>
+                </div>
+                <div class="mm-foot">
+                    <span class="mm-dot"></span>
+                    <span>SYS · ZYPRYX v1.0 — ORACLE ACTIVE</span>
+                </div>
+            </nav>
+        </div>
 
         @*Ambient layers*@
         <div class="grid-bg"></div>
